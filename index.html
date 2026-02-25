@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giscus Voting Demo — Agency Marketplace</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --green: #3fb950;
+            --red: #f85149;
+            --pink: #f778ba;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+        h1 { margin-bottom: 0.5rem; }
+        .subtitle { color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem; }
+        .subtitle a { color: var(--accent); text-decoration: none; }
+
+        /* Card grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 3rem;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            flex: 1;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Engagement row — matches PR design */
+        .engagement-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.8rem;
+        }
+        .engagement-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            cursor: default;
+        }
+        .engagement-item.readonly {
+            opacity: 0.6;
+        }
+        .engagement-item svg {
+            width: 16px;
+            height: 16px;
+        }
+        .eng-count {
+            font-size: 0.75rem;
+            min-width: 1ch;
+        }
+        .eng-discuss {
+            margin-left: auto;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .eng-discuss:hover {
+            text-decoration: underline;
+        }
+
+        /* Detail section */
+        .detail-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .detail-section h2 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        .detail-section p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        /* How it works */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .step {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            color: var(--bg);
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+        .step h3 {
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+        .step p {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        code {
+            background: rgba(110,118,129,0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        .banner {
+            background: linear-gradient(135deg, #1a1f35, #1a2d1a);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .banner a {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        .giscus-wrapper {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🗳️ Giscus Voting Demo</h1>
+<p class="subtitle">
+    Proof-of-concept for the <a href="https://github.com/agency-microsoft/marketplace-web/pull/14">Agency Marketplace voting feature (PR #14)</a>.
+    Shows how Giscus + GitHub Discussions powers real-time, shared voting — no backend needed.
+</p>
+
+<div class="banner">
+    ⚡ <strong>Try it!</strong> Click "Vote on Discussion" on any card, or scroll down to see the <strong>inline Giscus widget</strong> on the detail page.
+    <br>Votes are real GitHub Discussion reactions — shared across all users in real time.
+</div>
+
+<!-- Card grid -->
+<h2 style="margin-bottom:1rem;">Plugin Cards (Read-only counts + Discussion link)</h2>
+<div class="grid" id="card-grid"></div>
+
+<!-- Detail page simulation -->
+<h2 style="margin-bottom:1rem;">Plugin Detail Page (Inline Giscus)</h2>
+<div class="detail-section">
+    <h2>🐛 bug-fixer</h2>
+    <p>Automated bug detection and fixing assistant. Below is the live Giscus discussion widget — users can react and comment without leaving the page.</p>
+    <div class="giscus-wrapper">
+        <script src="https://giscus.app/client.js"
+            data-repo="LucasHua/giscus-voting-demo"
+            data-repo-id="R_kgDORZBeaQ"
+            data-category="General"
+            data-category-id="DIC_kwDORZBeac4C3N3A"
+            data-mapping="specific"
+            data-term="Votes: bug-fixer"
+            data-reactions-enabled="1"
+            data-emit-metadata="0"
+            data-input-position="top"
+            data-theme="dark_dimmed"
+            data-lang="en"
+            data-loading="lazy"
+            crossorigin="anonymous"
+            async>
+        </script>
+    </div>
+</div>
+
+<!-- How it works -->
+<h2 style="margin-bottom:1rem;">How It Works</h2>
+<div class="steps">
+    <div class="step">
+        <div class="step-num">1</div>
+        <h3>CI Syncs Discussions</h3>
+        <p><code>sync-vote-discussions.js</code> creates one Discussion per plugin. Runs on deploy (every 15 min).</p>
+    </div>
+    <div class="step">
+        <div class="step-num">2</div>
+        <h3>Cards Show Real Counts</h3>
+        <p>CI exports reaction counts to <code>vote-counts.json</code>. Cards display read-only 👍👎 tallies.</p>
+    </div>
+    <div class="step">
+        <div class="step-num">3</div>
+        <h3>Users Vote via Discussion</h3>
+        <p>"Vote on Discussion" link opens the GitHub Discussion. Users react with 👍 👎 ❤️ — counts update on next deploy.</p>
+    </div>
+    <div class="step">
+        <div class="step-num">4</div>
+        <h3>Giscus for Inline Voting</h3>
+        <p>On detail pages, Giscus embeds the Discussion inline. Users react and comment without leaving the marketplace.</p>
+    </div>
+</div>
+
+<div class="detail-section" style="margin-top:1rem;">
+    <h2>🔧 Setup for Repo Owner</h2>
+    <p>To enable this on the production marketplace:</p>
+    <ol style="color:var(--text-muted); font-size:0.9rem; padding-left:1.5rem; line-height:2;">
+        <li>Enable <strong>Discussions</strong> on the repo (Settings → Features)</li>
+        <li>Allow <code>discussions: write</code> in GitHub Actions permissions</li>
+        <li><em>(Optional)</em> Install <a href="https://github.com/apps/giscus" style="color:var(--accent);">Giscus app</a> for inline Discussion embeds</li>
+        <li>Merge <a href="https://github.com/agency-microsoft/marketplace-web/pull/14" style="color:var(--accent);">PR #14</a></li>
+    </ol>
+</div>
+
+<script>
+// Sample plugin data (simulating vote-counts.json)
+const plugins = [
+    { name: 'bug-fixer', desc: 'Automated bug detection and fixing', likes: 1, dislikes: 0, url: 'https://github.com/LucasHua/giscus-voting-demo/discussions/1' },
+    { name: 'code-reviewer', desc: 'AI-powered code review assistant', likes: 1, dislikes: 0, url: 'https://github.com/LucasHua/giscus-voting-demo/discussions/2' },
+    { name: 'rubber-duck', desc: 'Debugging companion for rubber duck debugging', likes: 1, dislikes: 1, url: 'https://github.com/LucasHua/giscus-voting-demo/discussions/3' },
+    { name: 'sfi-dev-toolkit', desc: 'Security Feature Integration developer tools', likes: 0, dislikes: 0, url: 'https://github.com/LucasHua/giscus-voting-demo/discussions/4' },
+    { name: 'deep-review', desc: 'Deep code analysis and review', likes: 0, dislikes: 0, url: 'https://github.com/LucasHua/giscus-voting-demo/discussions/5' },
+];
+
+const thumbUp = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8.834.066c.763.087 1.5.295 2.01.884.505.581.656 1.378.656 2.3 0 .467-.087 1.119-.157 1.637L11.328 5h1.422c.603 0 1.174.085 1.668.485.486.392.802.96.802 1.765 0 .335-.02.705-.074 1.048a3.1 3.1 0 0 1-.209.702c.152.332.222.753.222 1.25 0 .512-.07.975-.238 1.362-.06.137-.14.268-.228.392.095.314.134.688.134 1.066 0 .542-.074 1.06-.294 1.478-.208.399-.537.716-.987.886-.378.14-.812.2-1.272.2H8.75a5 5 0 0 1-1.737-.332l-.482-.178A6 6 0 0 0 4.4 12.7H3.5v-8h.937c.408 0 .79-.217 1.072-.542C6.095 3.478 6.78 2.29 7.634 1.439 7.94 1.132 8.36.02 8.834.066M4.5 13.3a.5.5 0 0 1-.4-.8l-1.6.8a.5.5 0 0 1 .4.8zM2.5 4H1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h1.5z"/></svg>`;
+const thumbDown = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M7.166 15.934c-.763-.087-1.5-.295-2.01-.884-.505-.581-.656-1.378-.656-2.3 0-.467.087-1.119.157-1.637L4.672 11H3.25c-.603 0-1.174-.085-1.668-.485C1.096 10.123.78 9.555.78 8.75c0-.335.02-.705.074-1.048.053-.34.138-.553.209-.702a2.1 2.1 0 0 1-.222-1.25c0-.512.07-.975.238-1.362.06-.137.14-.268.228-.392a2.3 2.3 0 0 1-.134-1.066c0-.542.074-1.06.294-1.478.208-.399.537-.716.987-.886.378-.14.812-.2 1.272-.2h4.276a5 5 0 0 1 1.737.332l.482.178A6 6 0 0 0 11.6 3.3h.9v8h-.937c-.408 0-.79.217-1.072.542-.563.68-1.248 1.868-2.102 2.719-.306.307-.726 1.42-1.2 1.373M11.5 2.7a.5.5 0 0 1 .4.8l1.6-.8a.5.5 0 0 1-.4-.8zM13.5 12H15a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-1.5z"/></svg>`;
+
+const grid = document.getElementById('card-grid');
+plugins.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+        <div class="card-name">${p.name}</div>
+        <div class="card-desc">${p.desc}</div>
+        <div class="engagement-row">
+            <span class="engagement-item readonly" title="Likes (read-only — vote on Discussion)">
+                ${thumbUp}
+                <span class="eng-count">${p.likes}</span>
+            </span>
+            <span class="engagement-item readonly" title="Dislikes (read-only — vote on Discussion)">
+                ${thumbDown}
+                <span class="eng-count">${p.dislikes}</span>
+            </span>
+            <a href="${p.url}" target="_blank" rel="noopener" class="eng-discuss">💬 Vote on Discussion</a>
+        </div>
+    `;
+    grid.appendChild(card);
+});
+</script>
+
+</body>
+</html>

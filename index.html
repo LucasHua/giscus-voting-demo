@@ -940,16 +940,13 @@ const PLUGINS = [
 const CARD_REACTIONS = ['THUMBS_UP', 'THUMBS_DOWN'];
 function renderReactions(plugin) {
     const reactions = plugin.reactions || {};
-    const pills = CARD_REACTIONS
-        .filter(type => (reactions[type] || 0) > 0)
+    return CARD_REACTIONS
         .map(type => {
             const r = REACTION_MAP[type];
-            const count = reactions[type];
+            const count = reactions[type] || 0;
             return `<button class="reaction-pill readonly" data-plugin="${plugin.name}" role="img" aria-label="${count} ${r.label}" title="${r.label} — click to discuss">${r.emoji} ${count}</button>`;
         })
         .join('');
-    if (!pills) return '';
-    return pills;
 }
 
 // ── Favorites (localStorage) ──

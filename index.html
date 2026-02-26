@@ -418,6 +418,28 @@
             pointer-events: none;
             opacity: 0.7;
         }
+        .fav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 9999px;
+            background: none;
+            border: 1px solid transparent;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            margin-left: auto;
+            transition: all 0.15s;
+        }
+        .fav-btn:hover {
+            color: var(--color-pink);
+            background: rgba(219,97,162,0.1);
+            border-color: rgba(219,97,162,0.3);
+        }
+        .fav-btn.active {
+            color: var(--color-pink);
+        }
 
         /* ── Detail Page ── */
         .detail-page {
@@ -714,6 +736,7 @@
                         <option value="name">Sort by Name</option>
                         <option value="recent">Recently Updated</option>
                         <option value="mostLiked">Most Liked</option>
+                        <option value="myFavorites">❤️ My Favorites</option>
                     </select>
                 </div>
             </div>
@@ -894,11 +917,25 @@ function renderReactions(plugin) {
     return pills;
 }
 
+// ── Favorites (localStorage) ──
+const FAV_KEY = 'demo-favs';
+function getFavs() {
+    try { return JSON.parse(localStorage.getItem(FAV_KEY)) || {}; } catch { return {}; }
+}
+function toggleFav(name) {
+    const favs = getFavs();
+    if (favs[name]) delete favs[name]; else favs[name] = true;
+    localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+    return !!favs[name];
+}
+
 // ── Render Card ──
 function renderCard(plugin) {
+    const isFav = !!getFavs()[plugin.name];
     const card = document.createElement('div');
     card.className = 'plugin-card';
     card.dataset.plugin = plugin.name;
+    const reactionHtml = renderReactions(plugin);
     card.innerHTML = `
         <div class="plugin-header">
             <div class="plugin-title-row">
@@ -920,7 +957,12 @@ function renderCard(plugin) {
             </div>
             <span class="category-badge">${plugin.category}</span>
         </div>
-        ${renderReactions(plugin) ? `<div class="engagement-row">${renderReactions(plugin)}</div>` : ''}
+        <div class="engagement-row">
+            ${reactionHtml}
+            <button class="fav-btn ${isFav ? 'active' : ''}" data-fav="${plugin.name}" title="Favorite (personal bookmark)">
+                ${isFav ? '❤️' : '🤍'}
+            </button>
+        </div>
     `;
     return card;
 }
@@ -1024,8 +1066,19 @@ document.addEventListener('click', (e) => {
     // Back button
     if (e.target.closest('#back-btn')) { hideDetail(); return; }
 
-    // Reaction pill links — let them open Discussion page
-    if (e.target.closest('.reaction-pill')) return;
+    // Fav toggle
+    const favBtn = e.target.closest('.fav-btn');
+    if (favBtn) {
+        e.stopPropagation();
+        const name = favBtn.dataset.fav;
+        const isFav = toggleFav(name);
+        // Update all fav buttons for this plugin
+        document.querySelectorAll(`.fav-btn[data-fav="${name}"]`).forEach(btn => {
+            btn.classList.toggle('active', isFav);
+            btn.textContent = isFav ? '❤️' : '🤍';
+        });
+        return;
+    }
 
     // Card click → detail
     const card = e.target.closest('.plugin-card');
@@ -1040,10 +1093,22 @@ document.getElementById('search-input').addEventListener('input', (e) => {
     });
 });
 
-// Sort (by total reactions)
+// Sort and filter
 document.getElementById('sort-filter').addEventListener('change', (e) => {
     const grid = document.getElementById('plugin-grid');
     const cards = [...grid.children];
+    const favs = getFavs();
+
+    if (e.target.value === 'myFavorites') {
+        // Show only favorited plugins
+        cards.forEach(c => {
+            c.style.display = favs[c.dataset.plugin] ? '' : 'none';
+        });
+        return;
+    }
+
+    // Show all, then sort
+    cards.forEach(c => { c.style.display = ''; });
     cards.sort((a, b) => {
         const pa = PLUGINS.find(p => p.name === a.dataset.plugin);
         const pb = PLUGINS.find(p => p.name === b.dataset.plugin);

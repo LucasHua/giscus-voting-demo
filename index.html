@@ -1106,26 +1106,7 @@ function showDetail(pluginName, initialTab = 'overview') {
 
         <div class="detail-tabpanel" role="tabpanel" id="panel-discussion" aria-labelledby="tab-discussion">
             <div class="plugin-info-card">
-                <h3>🔌 ${plugin.name}</h3>
                 <p class="plugin-info-desc">${plugin.desc}</p>
-                <div class="plugin-info-grid">
-                    <div class="plugin-info-item">
-                        <span class="label">Version</span>
-                        <span class="value">v${plugin.version}</span>
-                    </div>
-                    <div class="plugin-info-item">
-                        <span class="label">Author</span>
-                        <span class="value">${plugin.author}</span>
-                    </div>
-                    <div class="plugin-info-item">
-                        <span class="label">Category</span>
-                        <span class="value">${plugin.category}</span>
-                    </div>
-                    <div class="plugin-info-item">
-                        <span class="label">Components</span>
-                        <span class="value">${plugin.skills ? '⚡ ' + plugin.skills + ' Skills' : ''}${plugin.skills && plugin.agents ? '  ' : ''}${plugin.agents ? '🤖 ' + plugin.agents + ' Agent' + (plugin.agents !== 1 ? 's' : '') : ''}</span>
-                    </div>
-                </div>
                 ${plugin.discussion ? '<a class="plugin-info-link" href="' + plugin.discussion + '" target="_blank" rel="noopener">View full discussion on GitHub ↗</a>' : ''}
             </div>
             <div class="detail-section">

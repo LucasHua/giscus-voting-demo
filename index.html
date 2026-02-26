@@ -735,6 +735,7 @@
                     <select class="filter-select" id="sort-filter">
                         <option value="name">Sort by Name</option>
                         <option value="recent">Recently Updated</option>
+                        <option value="rating">Highest Rated</option>
                         <option value="mostLiked">Most Liked</option>
                         <option value="myFavorites">❤️ My Favorites</option>
                     </select>
@@ -1117,6 +1118,11 @@ document.getElementById('sort-filter').addEventListener('change', (e) => {
         const totalA = Object.values(pa.reactions || {}).reduce((s, c) => s + c, 0);
         const totalB = Object.values(pb.reactions || {}).reduce((s, c) => s + c, 0);
         if (e.target.value === 'mostLiked') return totalB - totalA;
+        if (e.target.value === 'rating') {
+            const rA = parseFloat(pa.qualityLabel.replace('★ ', '')) || 0;
+            const rB = parseFloat(pb.qualityLabel.replace('★ ', '')) || 0;
+            return rB - rA;
+        }
         return pa.name.localeCompare(pb.name);
     });
     cards.forEach(c => grid.appendChild(c));

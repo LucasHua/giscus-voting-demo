@@ -554,6 +554,49 @@
         .giscus-wrapper {
             min-height: 200px;
         }
+        .plugin-info-card {
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+        .plugin-info-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        .plugin-info-card .plugin-info-desc {
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: var(--spacing-md);
+            line-height: 1.6;
+        }
+        .plugin-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: var(--spacing-sm) var(--spacing-md);
+        }
+        .plugin-info-item {
+            font-size: 0.8rem;
+        }
+        .plugin-info-item .label {
+            color: var(--color-text-muted);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .plugin-info-item .value {
+            color: var(--color-text-primary);
+            font-weight: 500;
+        }
+        .plugin-info-link {
+            display: inline-block;
+            margin-top: var(--spacing-md);
+            font-size: 0.8rem;
+            color: var(--color-accent-secondary);
+            text-decoration: none;
+        }
+        .plugin-info-link:hover { text-decoration: underline; }
 
         /* Skills/agents detail */
         .component-list {
@@ -1062,8 +1105,31 @@ function showDetail(pluginName, initialTab = 'overview') {
         </div>
 
         <div class="detail-tabpanel" role="tabpanel" id="panel-discussion" aria-labelledby="tab-discussion">
+            <div class="plugin-info-card">
+                <h3>🔌 ${plugin.name}</h3>
+                <p class="plugin-info-desc">${plugin.desc}</p>
+                <div class="plugin-info-grid">
+                    <div class="plugin-info-item">
+                        <span class="label">Version</span>
+                        <span class="value">v${plugin.version}</span>
+                    </div>
+                    <div class="plugin-info-item">
+                        <span class="label">Author</span>
+                        <span class="value">${plugin.author}</span>
+                    </div>
+                    <div class="plugin-info-item">
+                        <span class="label">Category</span>
+                        <span class="value">${plugin.category}</span>
+                    </div>
+                    <div class="plugin-info-item">
+                        <span class="label">Components</span>
+                        <span class="value">${plugin.skills ? '⚡ ' + plugin.skills + ' Skills' : ''}${plugin.skills && plugin.agents ? '  ' : ''}${plugin.agents ? '🤖 ' + plugin.agents + ' Agent' + (plugin.agents !== 1 ? 's' : '') : ''}</span>
+                    </div>
+                </div>
+                ${plugin.discussion ? '<a class="plugin-info-link" href="' + plugin.discussion + '" target="_blank" rel="noopener">View full discussion on GitHub ↗</a>' : ''}
+            </div>
             <div class="detail-section">
-                <h3 class="detail-section-title">💬 Community Discussion</h3>
+                <h3 class="detail-section-title">💬 Comments & Reactions</h3>
                 <div class="giscus-wrapper" id="giscus-container" aria-live="polite"></div>
             </div>
         </div>

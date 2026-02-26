@@ -3,285 +3,1161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Giscus Voting Demo — Agency Marketplace</title>
+    <title>Agency Marketplace — Voting Demo</title>
     <style>
+        /* ── Tokens (matching marketplace dark theme) ── */
         :root {
-            --bg: #0d1117;
-            --surface: #161b22;
-            --border: #30363d;
-            --text: #e6edf3;
-            --text-muted: #8b949e;
-            --accent: #58a6ff;
-            --green: #3fb950;
-            --red: #f85149;
-            --pink: #f778ba;
+            --color-bg-primary: #0d1117;
+            --color-bg-secondary: #161b22;
+            --color-bg-tertiary: #21262d;
+            --color-bg-elevated: #2d333b;
+            --color-text-primary: #f0f6fc;
+            --color-text-secondary: #c9d1d9;
+            --color-text-muted: #8b949e;
+            --color-accent: #0078D4;
+            --color-accent-secondary: #3DCBFF;
+            --color-border: #30363d;
+            --color-border-hover: #484f58;
+            --color-green: #56d364;
+            --color-purple: #a371f7;
+            --color-red: #f85149;
+            --color-pink: #db61a2;
+            --color-cyan: #39c5cf;
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* ── Reset ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
             line-height: 1.6;
-            padding: 2rem;
+            min-height: 100vh;
         }
-        h1 { margin-bottom: 0.5rem; }
-        .subtitle { color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem; }
-        .subtitle a { color: var(--accent); text-decoration: none; }
 
-        /* Card grid */
-        .grid {
+        /* ── Container ── */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+
+        /* ── ASCII Hero Banner ── */
+        .ascii-hero {
+            text-align: center;
+            padding: var(--spacing-xl) 0 var(--spacing-md);
+            position: relative;
+            overflow: hidden;
+        }
+        .ascii-hero-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+        .ascii-banner {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            font-size: clamp(0.35rem, 1.2vw, 0.7rem);
+            line-height: 1.2;
+            color: var(--color-accent);
+            white-space: pre;
+            overflow: hidden;
+            opacity: 0.85;
+            user-select: none;
+        }
+        .ascii-hero-tagline {
+            font-size: 0.95rem;
+            color: var(--color-text-muted);
+            margin-top: var(--spacing-sm);
+        }
+        .ascii-hero-rule {
+            border: none;
+            border-top: 1px solid var(--color-border);
+            margin-top: var(--spacing-md);
+        }
+
+        /* ── Tabs ── */
+        .tabs-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: var(--spacing-lg);
+        }
+        .tabs {
+            display: flex;
+            gap: var(--spacing-xs);
+        }
+        .tab {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+            padding: var(--spacing-sm) var(--spacing-md);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tab:hover { color: var(--color-text-secondary); }
+        .tab.active {
+            color: var(--color-text-primary);
+            border-bottom-color: var(--color-accent);
+        }
+        .tab-count {
+            font-size: 0.75rem;
+            background: var(--color-bg-tertiary);
+            padding: 1px 6px;
+            border-radius: 9999px;
+            color: var(--color-text-muted);
+        }
+        .site-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        .header-btn {
+            background: none;
+            border: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            padding: 6px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .header-btn:hover {
+            color: var(--color-text-primary);
+            border-color: var(--color-border-hover);
+        }
+        .header-btn .icon { width: 18px; height: 18px; }
+
+        /* ── Hero ── */
+        .hero {
+            margin-bottom: var(--spacing-xl);
+        }
+        .hero-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+        }
+        .hero-description {
+            color: var(--color-text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: var(--spacing-md);
+        }
+        .hero-description strong {
+            color: var(--color-accent-secondary);
+        }
+        .hero-install {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+        }
+        .hero-install-label {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+        }
+        .hero-install-cmd {
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.8125rem;
+            color: var(--color-green);
+        }
+        .hero-install-placeholder {
+            color: var(--color-text-muted);
+        }
+
+        /* ── Search & Filters ── */
+        .search-section {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+        .search-container {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: var(--color-text-muted);
+            pointer-events: none;
+        }
+        .search-input {
+            width: 100%;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-primary);
+            font-size: 0.875rem;
+            padding: 10px 12px 10px 36px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--color-accent);
+        }
+        .search-input::placeholder {
+            color: var(--color-text-muted);
+        }
+        .filter-container {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        .filter-select {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-secondary);
+            font-size: 0.8125rem;
+            padding: 8px 12px;
+            outline: none;
+            cursor: pointer;
+        }
+        .filter-select:focus { border-color: var(--color-accent); }
+        .filter-select option { background: var(--color-bg-secondary); }
+
+        /* ── Plugin Grid ── */
+        .plugin-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 3rem;
-        }
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.25rem;
-            display: flex;
-            flex-direction: column;
-        }
-        .card-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        .card-desc {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            flex: 1;
-            margin-bottom: 0.75rem;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
         }
 
-        /* Engagement row — matches PR design */
+        /* ── Plugin Card ── */
+        .plugin-card {
+            background: linear-gradient(145deg, var(--color-bg-secondary) 0%, rgba(22,27,34,0.8) 100%);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+            min-height: 200px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            animation: cardEntrance 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+        .plugin-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--color-accent), var(--color-accent-secondary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .plugin-card:hover {
+            border-color: var(--color-border-hover);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        .plugin-card:hover::after {
+            transform: scaleX(1);
+        }
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: translateY(20px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .plugin-card:nth-child(1) { animation-delay: 0ms; }
+        .plugin-card:nth-child(2) { animation-delay: 50ms; }
+        .plugin-card:nth-child(3) { animation-delay: 100ms; }
+        .plugin-card:nth-child(4) { animation-delay: 150ms; }
+        .plugin-card:nth-child(5) { animation-delay: 200ms; }
+        .plugin-card:nth-child(6) { animation-delay: 250ms; }
+
+        /* Card Header */
+        .plugin-header { margin-bottom: var(--spacing-sm); }
+        .plugin-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--spacing-sm);
+        }
+        .plugin-name {
+            font-size: 1.0625rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            transition: color 0.2s;
+        }
+        .plugin-card:hover .plugin-name {
+            color: var(--color-accent);
+        }
+        .quality-score-badge {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            white-space: nowrap;
+        }
+        .quality-high { background: rgba(86,211,100,0.15); color: var(--color-green); }
+        .quality-mid { background: rgba(57,197,207,0.15); color: var(--color-cyan); }
+
+        .plugin-meta-row {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+            margin-top: 2px;
+        }
+        .plugin-version {
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.625rem;
+            color: var(--color-text-muted);
+        }
+        .plugin-author {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        .source-badge {
+            font-size: 0.625rem;
+            font-weight: 500;
+            padding: 1px 6px;
+            border-radius: 9999px;
+        }
+        .source-playground { background: rgba(163,113,247,0.15); color: var(--color-purple); }
+        .source-curated { background: rgba(86,211,100,0.15); color: var(--color-green); }
+
+        /* Card Body */
+        .plugin-description {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* Card Footer */
+        .plugin-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        .plugin-stats {
+            display: flex;
+            gap: var(--spacing-sm);
+            font-size: 0.8125rem;
+            color: var(--color-text-muted);
+        }
+        .stat-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .stat-separator {
+            color: var(--color-border);
+        }
+        .category-badge {
+            font-size: 0.6875rem;
+            font-weight: 500;
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-muted);
+            padding: 2px 8px;
+            border-radius: 9999px;
+        }
+
+        /* ── Engagement Row (Voting) ── */
         .engagement-row {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            padding-top: 0.5rem;
-            border-top: 1px solid var(--border);
-            font-size: 0.8rem;
+            gap: 12px;
+            padding-top: var(--spacing-sm);
+            margin-top: var(--spacing-sm);
+            border-top: 1px solid var(--color-border);
         }
         .engagement-item {
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            color: var(--text-muted);
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            padding: 2px 4px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: none;
             cursor: default;
-        }
-        .engagement-item.readonly {
-            opacity: 0.6;
+            transition: all 0.15s;
         }
         .engagement-item svg {
             width: 16px;
             height: 16px;
+            opacity: 0.7;
+            transition: opacity 0.15s;
         }
+        .engagement-item.readonly {
+            opacity: 0.5;
+        }
+        .engagement-item.interactive {
+            cursor: pointer;
+        }
+        .engagement-item.interactive:hover {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-secondary);
+        }
+        .engagement-item.interactive:hover svg { opacity: 1; }
+        .engagement-item.fav-active {
+            color: var(--color-pink);
+        }
+        .engagement-item.fav-active svg {
+            opacity: 1;
+            fill: var(--color-pink);
+            stroke: var(--color-pink);
+        }
+        .engagement-item.like-active {
+            color: #2ea043;
+            opacity: 1;
+        }
+        .engagement-item.like-active svg { opacity: 1; }
+        .engagement-item.dislike-active {
+            color: var(--color-red);
+            opacity: 1;
+        }
+        .engagement-item.dislike-active svg { opacity: 1; }
         .eng-count {
             font-size: 0.75rem;
             min-width: 1ch;
         }
         .eng-discuss {
             margin-left: auto;
-            color: var(--accent);
+            color: var(--color-text-muted);
             text-decoration: none;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            opacity: 0.7;
+            transition: opacity 0.15s, color 0.15s;
             display: inline-flex;
             align-items: center;
             gap: 4px;
         }
         .eng-discuss:hover {
-            text-decoration: underline;
+            opacity: 1;
+            color: var(--color-accent-secondary);
         }
 
-        /* Detail section */
+        /* ── Detail Page ── */
+        .detail-page {
+            display: none;
+        }
+        .detail-page.visible {
+            display: block;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+            padding: var(--spacing-sm) var(--spacing-md);
+            cursor: pointer;
+            margin-bottom: var(--spacing-lg);
+            transition: all 0.2s;
+        }
+        .back-btn:hover {
+            color: var(--color-accent);
+            border-color: var(--color-border-hover);
+        }
+        .back-btn svg { width: 16px; height: 16px; }
+        .detail-header {
+            margin-bottom: var(--spacing-lg);
+        }
+        .detail-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+        }
+        .detail-meta {
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+            margin-bottom: var(--spacing-md);
+        }
+        .detail-description {
+            color: var(--color-text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        /* Detail vote row */
+        .detail-vote-row {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        .detail-vote-row .engagement-item {
+            font-size: 0.875rem;
+        }
+        .detail-vote-row .engagement-item svg {
+            width: 18px;
+            height: 18px;
+        }
+        .detail-vote-row .eng-count {
+            font-size: 0.875rem;
+        }
+        .detail-vote-row .eng-discuss {
+            font-size: 0.85rem;
+        }
+
+        /* Giscus section */
         .detail-section {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
         }
-        .detail-section h2 {
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
+        .detail-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
         }
-        .detail-section p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
+        .giscus-wrapper {
+            min-height: 200px;
         }
 
-        /* How it works */
+        /* Skills/agents detail */
+        .component-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+        .component-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+        }
+        .component-icon { font-size: 1rem; }
+        .component-name { color: var(--color-text-primary); font-weight: 500; }
+        .component-desc { color: var(--color-text-muted); font-size: 0.8rem; margin-left: auto; }
+
+        /* ── Footer ── */
+        .footer {
+            border-top: 1px solid var(--color-border);
+            padding: var(--spacing-xl) 0;
+            text-align: center;
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+        }
+        .footer a {
+            color: var(--color-accent);
+            text-decoration: none;
+        }
+        .footer a:hover { text-decoration: underline; }
+        .footer-note {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: var(--spacing-sm);
+        }
+
+        /* ── How it works ── */
+        .how-section {
+            margin: var(--spacing-xl) 0;
+        }
+        .how-section h2 {
+            font-size: 1.25rem;
+            margin-bottom: var(--spacing-md);
+        }
         .steps {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: var(--spacing-md);
         }
         .step {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
         }
         .step-num {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 28px;
-            height: 28px;
-            background: var(--accent);
-            color: var(--bg);
+            width: 26px;
+            height: 26px;
+            background: var(--color-accent);
+            color: var(--color-bg-primary);
             border-radius: 50%;
             font-weight: 700;
-            font-size: 0.85rem;
-            margin-bottom: 0.5rem;
-        }
-        .step h3 {
-            font-size: 0.95rem;
-            margin-bottom: 0.25rem;
-        }
-        .step p {
-            color: var(--text-muted);
             font-size: 0.8rem;
+            margin-bottom: var(--spacing-sm);
         }
+        .step h3 { font-size: 0.9rem; margin-bottom: var(--spacing-xs); }
+        .step p { color: var(--color-text-muted); font-size: 0.8rem; }
         code {
             background: rgba(110,118,129,0.2);
             padding: 2px 6px;
-            border-radius: 4px;
+            border-radius: var(--radius-sm);
             font-size: 0.85em;
+            font-family: 'SFMono-Regular', Consolas, monospace;
         }
-        .banner {
-            background: linear-gradient(135deg, #1a1f35, #1a2d1a);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.25rem;
-            margin-bottom: 2rem;
+
+        /* ── Setup callout ── */
+        .setup-callout {
+            background: linear-gradient(135deg, rgba(0,120,212,0.08), rgba(61,203,255,0.05));
+            border: 1px solid rgba(0,120,212,0.25);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+        }
+        .setup-callout h3 {
+            color: var(--color-accent-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+        .setup-callout ol {
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+            padding-left: 1.5rem;
+            line-height: 2;
+        }
+        .setup-callout a { color: var(--color-accent-secondary); text-decoration: none; }
+        .setup-callout a:hover { text-decoration: underline; }
+
+        /* ── Demo banner ── */
+        .demo-banner {
+            background: linear-gradient(135deg, rgba(0,120,212,0.12), rgba(86,211,100,0.08));
+            border: 1px solid rgba(0,120,212,0.3);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
             text-align: center;
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
         }
-        .banner a {
-            color: var(--accent);
-            font-weight: 600;
-        }
-        .giscus-wrapper {
-            margin-top: 1rem;
+        .demo-banner strong { color: var(--color-accent-secondary); }
+        .demo-banner a { color: var(--color-accent-secondary); text-decoration: none; }
+
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            .plugin-grid { grid-template-columns: 1fr; }
+            .search-section { flex-direction: column; }
+            .hero-title { font-size: 1.5rem; }
+            .hero-install { flex-wrap: wrap; }
+            .ascii-banner { display: none; }
         }
     </style>
 </head>
 <body>
+    <div class="container">
 
-<h1>🗳️ Giscus Voting Demo</h1>
-<p class="subtitle">
-    Proof-of-concept for the <a href="https://github.com/agency-microsoft/marketplace-web/pull/14">Agency Marketplace voting feature (PR #14)</a>.
-    Shows how Giscus + GitHub Discussions powers real-time, shared voting — no backend needed.
-</p>
+        <!-- ASCII Hero Banner -->
+        <section class="ascii-hero">
+            <div class="ascii-hero-wrapper">
+                <pre class="ascii-banner" aria-hidden="true">
+ ███          ██████    ███████  ██████  ████████    ██████  █████ █████       ████           
+▒▒▒███       ░░░░░███  ███░░███ ███░░███░░███░░███  ███░░███░░███ ░███        ░████  ████████ 
+  ▒▒▒███      ███████ ░███ ░███░███████  ░███ ░███ ░███ ░░░  ░███ ░███        ░░░░  ░████████ 
+   ███▒      ███░░███ ░███ ░███░███░░░   ░███ ░███ ░███  ███ ░███ ░███     ██████   ░████████ 
+ ███▒       ░░████████░░███████░░██████  ████ █████░░██████  ░░███████    ░██████   ░████████ 
+▒▒▒         ░░░░░░░░  ░░░░░░███ ░░░░░░  ░░░░ ░░░░░  ░░░░░░    ░░░ ░███    ░░░░░░   ░░░░░░░░  
+                       ███ ░███                               ███ ░███    ░░░░░░              
+                      ░░██████                               ░░██████                           
+                       ░░░░░░                                 ░░░░░░                          </pre>
+                <p class="ascii-hero-tagline">Your AI pair programming marketplace</p>
+            </div>
+            <hr class="ascii-hero-rule">
+        </section>
 
-<div class="banner">
-    ⚡ <strong>Try it!</strong> Click "Vote on Discussion" on any card, or scroll down to see the <strong>inline Giscus widget</strong> on the detail page.
-    <br>Votes are real GitHub Discussion reactions — shared across all users in real time.
-</div>
+        <main>
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab active">
+                        <span>📦</span> Plugins <span class="tab-count">6</span>
+                    </button>
+                    <button class="tab">
+                        <span>⚡</span> Skills <span class="tab-count">14</span>
+                    </button>
+                    <button class="tab">
+                        <span>🤖</span> Agents <span class="tab-count">8</span>
+                    </button>
+                    <button class="tab">
+                        <span>📊</span> Stats
+                    </button>
+                </div>
+                <div class="site-controls">
+                    <button class="header-btn" title="Toggle theme">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                        </svg>
+                    </button>
+                    <a href="https://github.com/LucasHua/giscus-voting-demo" target="_blank" rel="noopener" class="header-btn" title="View on GitHub">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+                            <path d="M9 18c-4.51 2-5-2-7-2"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
 
-<!-- Card grid -->
-<h2 style="margin-bottom:1rem;">Plugin Cards (Read-only counts + Discussion link)</h2>
-<div class="grid" id="card-grid"></div>
+            <!-- Hero -->
+            <section class="hero">
+                <h1 class="hero-title">Discover Plugins</h1>
+                <p class="hero-description">
+                    Browse and install <strong>plugins</strong> for Copilot and Claude.
+                </p>
+                <div class="hero-install">
+                    <span class="hero-install-label">Install any plugin in one command:</span>
+                    <code class="hero-install-cmd">/plugin install <span class="hero-install-placeholder">&lt;name&gt;</span>@agency</code>
+                </div>
+            </section>
 
-<!-- Detail page simulation -->
-<h2 style="margin-bottom:1rem;">Plugin Detail Page (Inline Giscus)</h2>
-<div class="detail-section">
-    <h2>🐛 bug-fixer</h2>
-    <p>Automated bug detection and fixing assistant. Below is the live Giscus discussion widget — users can react and comment without leaving the page.</p>
-    <div class="giscus-wrapper">
-        <script src="https://giscus.app/client.js"
-            data-repo="LucasHua/giscus-voting-demo"
-            data-repo-id="R_kgDORZBeaQ"
-            data-category="General"
-            data-category-id="DIC_kwDORZBeac4C3N3A"
-            data-mapping="specific"
-            data-term="Votes: bug-fixer"
-            data-reactions-enabled="1"
-            data-emit-metadata="0"
-            data-input-position="top"
-            data-theme="dark_dimmed"
-            data-lang="en"
-            data-loading="lazy"
-            crossorigin="anonymous"
-            async>
-        </script>
+            <!-- Demo Banner -->
+            <div class="demo-banner">
+                ⚡ <strong>Voting Demo</strong> — This page demonstrates the <a href="https://github.com/agency-microsoft/marketplace-web/pull/14">voting feature (PR #14)</a>.
+                Click any card to see the <strong>Giscus inline voting</strong> widget. Try reacting to a discussion — it's real-time!
+            </div>
+
+            <!-- Search & Filters -->
+            <div class="search-section">
+                <div class="search-container">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <input type="text" class="search-input" id="search-input" placeholder="Search plugins..." aria-label="Search plugins">
+                </div>
+                <div class="filter-container">
+                    <select class="filter-select">
+                        <option>All Categories</option>
+                        <option>Development</option>
+                        <option>Productivity</option>
+                        <option>Security</option>
+                        <option>Documentation</option>
+                    </select>
+                    <select class="filter-select" id="sort-filter">
+                        <option value="name">Sort by Name</option>
+                        <option value="recent">Recently Updated</option>
+                        <option value="mostLiked">Most Liked</option>
+                        <option value="myFavorites">❤️ My Favorites</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Plugin Grid -->
+            <div class="plugin-grid" id="plugin-grid"></div>
+
+            <!-- Detail Page (hidden by default) -->
+            <div class="detail-page" id="detail-page">
+                <button class="back-btn" id="back-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Plugins
+                </button>
+                <div id="detail-content"></div>
+            </div>
+
+            <!-- How it works -->
+            <div class="how-section" id="how-section">
+                <h2>How Voting Works</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <h3>CI Syncs Discussions</h3>
+                        <p><code>sync-vote-discussions.js</code> creates one GitHub Discussion per plugin. Runs every 15 min via CI.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <h3>Cards Show Real Counts</h3>
+                        <p>CI exports reaction counts to <code>vote-counts.json</code>. Cards display read-only 👍👎 tallies from shared data.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <h3>Vote on Discussion</h3>
+                        <p>"💬 Vote on Discussion" opens the GitHub Discussion page. Users react with 👍 👎 ❤️ — counts refresh on next deploy.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">4</div>
+                        <h3>Giscus Inline Voting</h3>
+                        <p>On detail pages, <a href="https://giscus.app" target="_blank" style="color:var(--color-accent-secondary)">Giscus</a> embeds the Discussion inline. Users react and comment without leaving the marketplace.</p>
+                    </div>
+                </div>
+
+                <div class="setup-callout">
+                    <h3>🔧 Setup for Repo Owner</h3>
+                    <ol>
+                        <li>Enable <strong>Discussions</strong> on the repo (Settings → Features)</li>
+                        <li>Allow <code>discussions: write</code> in GitHub Actions permissions</li>
+                        <li><em>(Optional)</em> Install <a href="https://github.com/apps/giscus">Giscus GitHub App</a> for inline Discussion embeds on detail pages</li>
+                        <li>Merge <a href="https://github.com/agency-microsoft/marketplace-web/pull/14">PR #14</a></li>
+                    </ol>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Voting Demo — <a href="https://github.com/agency-microsoft/marketplace-web/pull/14">PR #14</a> · Powered by <a href="https://giscus.app">Giscus</a> + GitHub Discussions</p>
+            <p class="footer-note">This is a demo. Plugin names and descriptions are illustrative only.</p>
+        </footer>
     </div>
-</div>
-
-<!-- How it works -->
-<h2 style="margin-bottom:1rem;">How It Works</h2>
-<div class="steps">
-    <div class="step">
-        <div class="step-num">1</div>
-        <h3>CI Syncs Discussions</h3>
-        <p><code>sync-vote-discussions.js</code> creates one Discussion per plugin. Runs on deploy (every 15 min).</p>
-    </div>
-    <div class="step">
-        <div class="step-num">2</div>
-        <h3>Cards Show Real Counts</h3>
-        <p>CI exports reaction counts to <code>vote-counts.json</code>. Cards display read-only 👍👎 tallies.</p>
-    </div>
-    <div class="step">
-        <div class="step-num">3</div>
-        <h3>Users Vote via Discussion</h3>
-        <p>"Vote on Discussion" link opens the GitHub Discussion. Users react with 👍 👎 ❤️ — counts update on next deploy.</p>
-    </div>
-    <div class="step">
-        <div class="step-num">4</div>
-        <h3>Giscus for Inline Voting</h3>
-        <p>On detail pages, Giscus embeds the Discussion inline. Users react and comment without leaving the marketplace.</p>
-    </div>
-</div>
-
-<div class="detail-section" style="margin-top:1rem;">
-    <h2>🔧 Setup for Repo Owner</h2>
-    <p>To enable this on the production marketplace:</p>
-    <ol style="color:var(--text-muted); font-size:0.9rem; padding-left:1.5rem; line-height:2;">
-        <li>Enable <strong>Discussions</strong> on the repo (Settings → Features)</li>
-        <li>Allow <code>discussions: write</code> in GitHub Actions permissions</li>
-        <li><em>(Optional)</em> Install <a href="https://github.com/apps/giscus" style="color:var(--accent);">Giscus app</a> for inline Discussion embeds</li>
-        <li>Merge <a href="https://github.com/agency-microsoft/marketplace-web/pull/14" style="color:var(--accent);">PR #14</a></li>
-    </ol>
-</div>
 
 <script>
-// Sample plugin data (simulating vote-counts.json)
-const plugins = [
-    { name: 'bug-fixer', desc: 'Automated bug detection and fixing', likes: 1, dislikes: 0, url: 'https://github.com/LucasHua/giscus-voting-demo/discussions/1' },
-    { name: 'code-reviewer', desc: 'AI-powered code review assistant', likes: 1, dislikes: 0, url: 'https://github.com/LucasHua/giscus-voting-demo/discussions/2' },
-    { name: 'rubber-duck', desc: 'Debugging companion for rubber duck debugging', likes: 1, dislikes: 1, url: 'https://github.com/LucasHua/giscus-voting-demo/discussions/3' },
-    { name: 'sfi-dev-toolkit', desc: 'Security Feature Integration developer tools', likes: 0, dislikes: 0, url: 'https://github.com/LucasHua/giscus-voting-demo/discussions/4' },
-    { name: 'deep-review', desc: 'Deep code analysis and review', likes: 0, dislikes: 0, url: 'https://github.com/LucasHua/giscus-voting-demo/discussions/5' },
+// ── SVG Icons ──
+const ICONS = {
+    thumbUp: `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8.834.066c.763.087 1.5.295 2.01.884.505.581.656 1.378.656 2.3 0 .467-.087 1.119-.157 1.637L11.328 5h1.422c.603 0 1.174.085 1.668.485.486.392.802.96.802 1.765 0 .335-.02.705-.074 1.048a3.1 3.1 0 0 1-.209.702c.152.332.222.753.222 1.25 0 .512-.07.975-.238 1.362a2 2 0 0 1-.228.392c.095.314.134.688.134 1.066 0 .542-.074 1.06-.294 1.478-.208.399-.537.716-.987.886-.378.14-.812.2-1.272.2H8.75a5 5 0 0 1-1.737-.332l-.482-.178A6 6 0 0 0 4.4 12.7H3.5v-8h.937c.408 0 .79-.217 1.072-.542C6.095 3.478 6.78 2.29 7.634 1.439 7.94 1.132 8.36.02 8.834.066M2.5 4H1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h1.5z"/></svg>`,
+    thumbDown: `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M7.166 15.934c-.763-.087-1.5-.295-2.01-.884-.505-.581-.656-1.378-.656-2.3 0-.467.087-1.119.157-1.637L4.672 11H3.25c-.603 0-1.174-.085-1.668-.485C1.096 10.123.78 9.555.78 8.75c0-.335.02-.705.074-1.048.053-.34.138-.553.209-.702a2.1 2.1 0 0 1-.222-1.25c0-.512.07-.975.238-1.362.06-.137.14-.268.228-.392a2.3 2.3 0 0 1-.134-1.066c0-.542.074-1.06.294-1.478.208-.399.537-.716.987-.886.378-.14.812-.2 1.272-.2h4.276a5 5 0 0 1 1.737.332l.482.178A6 6 0 0 0 11.6 3.3h.9v8h-.937c-.408 0-.79.217-1.072.542-.563.68-1.248 1.868-2.102 2.719-.306.307-.726 1.42-1.2 1.373M13.5 12H15a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-1.5z"/></svg>`,
+    heart: `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 14s-5.5-3.5-5.5-7A3.5 3.5 0 0 1 8 4a3.5 3.5 0 0 1 5.5 3c0 3.5-5.5 7-5.5 7z"/></svg>`,
+    heartFill: `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 14s-5.5-3.5-5.5-7A3.5 3.5 0 0 1 8 4a3.5 3.5 0 0 1 5.5 3c0 3.5-5.5 7-5.5 7z"/></svg>`,
+};
+
+// ── Sample Plugin Data (pseudo, not real) ──
+const PLUGINS = [
+    {
+        name: 'bug-fixer',
+        desc: 'Automated bug detection and resolution assistant that analyzes stack traces and suggests targeted patches.',
+        version: '1.2.0',
+        author: 'Alice Zhang',
+        source: 'curated',
+        quality: 'high',
+        qualityLabel: '★ 4.8',
+        category: 'Development',
+        skills: 3, agents: 1,
+        likes: 12, dislikes: 1,
+        discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/1',
+        giscusTerm: 'Votes: bug-fixer',
+    },
+    {
+        name: 'code-reviewer',
+        desc: 'AI-powered code review that catches bugs, security issues, and style violations before they ship.',
+        version: '2.0.1',
+        author: 'Bob Kim',
+        source: 'curated',
+        quality: 'high',
+        qualityLabel: '★ 4.6',
+        category: 'Development',
+        skills: 2, agents: 1,
+        likes: 8, dislikes: 0,
+        discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/2',
+        giscusTerm: 'Votes: code-reviewer',
+    },
+    {
+        name: 'rubber-duck',
+        desc: 'Thoughtful debugging companion that walks through problems with you using Socratic method.',
+        version: '0.9.3',
+        author: 'Carol Wu',
+        source: 'playground',
+        quality: 'mid',
+        qualityLabel: '★ 3.9',
+        category: 'Productivity',
+        skills: 1, agents: 1,
+        likes: 5, dislikes: 2,
+        discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/3',
+        giscusTerm: 'Votes: rubber-duck',
+    },
+    {
+        name: 'secure-scan',
+        desc: 'Static analysis tool that identifies vulnerabilities, hardcoded secrets, and compliance gaps in your code.',
+        version: '1.5.0',
+        author: 'Dan Patel',
+        source: 'curated',
+        quality: 'high',
+        qualityLabel: '★ 4.7',
+        category: 'Security',
+        skills: 4, agents: 0,
+        likes: 15, dislikes: 0,
+        discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/4',
+        giscusTerm: 'Votes: sfi-dev-toolkit',
+    },
+    {
+        name: 'doc-writer',
+        desc: 'Generates comprehensive API documentation, README files, and inline code comments from your source.',
+        version: '1.1.0',
+        author: 'Eve Johnson',
+        source: 'playground',
+        quality: 'mid',
+        qualityLabel: '★ 4.0',
+        category: 'Documentation',
+        skills: 2, agents: 0,
+        likes: 3, dislikes: 1,
+        discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/5',
+        giscusTerm: 'Votes: deep-review',
+    },
+    {
+        name: 'perf-profiler',
+        desc: 'Performance analysis plugin that identifies bottlenecks, memory leaks, and optimization opportunities.',
+        version: '0.8.0',
+        author: 'Frank Lee',
+        source: 'playground',
+        quality: 'mid',
+        qualityLabel: '★ 3.7',
+        category: 'Development',
+        skills: 2, agents: 1,
+        likes: 1, dislikes: 0,
+        discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/1',
+        giscusTerm: 'Votes: bug-fixer',
+    },
 ];
 
-const thumbUp = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8.834.066c.763.087 1.5.295 2.01.884.505.581.656 1.378.656 2.3 0 .467-.087 1.119-.157 1.637L11.328 5h1.422c.603 0 1.174.085 1.668.485.486.392.802.96.802 1.765 0 .335-.02.705-.074 1.048a3.1 3.1 0 0 1-.209.702c.152.332.222.753.222 1.25 0 .512-.07.975-.238 1.362-.06.137-.14.268-.228.392.095.314.134.688.134 1.066 0 .542-.074 1.06-.294 1.478-.208.399-.537.716-.987.886-.378.14-.812.2-1.272.2H8.75a5 5 0 0 1-1.737-.332l-.482-.178A6 6 0 0 0 4.4 12.7H3.5v-8h.937c.408 0 .79-.217 1.072-.542C6.095 3.478 6.78 2.29 7.634 1.439 7.94 1.132 8.36.02 8.834.066M4.5 13.3a.5.5 0 0 1-.4-.8l-1.6.8a.5.5 0 0 1 .4.8zM2.5 4H1a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h1.5z"/></svg>`;
-const thumbDown = `<svg viewBox="0 0 16 16" fill="currentColor"><path d="M7.166 15.934c-.763-.087-1.5-.295-2.01-.884-.505-.581-.656-1.378-.656-2.3 0-.467.087-1.119.157-1.637L4.672 11H3.25c-.603 0-1.174-.085-1.668-.485C1.096 10.123.78 9.555.78 8.75c0-.335.02-.705.074-1.048.053-.34.138-.553.209-.702a2.1 2.1 0 0 1-.222-1.25c0-.512.07-.975.238-1.362.06-.137.14-.268.228-.392a2.3 2.3 0 0 1-.134-1.066c0-.542.074-1.06.294-1.478.208-.399.537-.716.987-.886.378-.14.812-.2 1.272-.2h4.276a5 5 0 0 1 1.737.332l.482.178A6 6 0 0 0 11.6 3.3h.9v8h-.937c-.408 0-.79.217-1.072.542-.563.68-1.248 1.868-2.102 2.719-.306.307-.726 1.42-1.2 1.373M11.5 2.7a.5.5 0 0 1 .4.8l1.6-.8a.5.5 0 0 1-.4-.8zM13.5 12H15a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-1.5z"/></svg>`;
+// ── Favorites (localStorage) ──
+const FAV_KEY = 'demo-favs';
+function getFavs() {
+    try { return JSON.parse(localStorage.getItem(FAV_KEY)) || {}; } catch { return {}; }
+}
+function toggleFav(name) {
+    const favs = getFavs();
+    if (favs[name]) delete favs[name]; else favs[name] = true;
+    localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+    return !!favs[name];
+}
 
-const grid = document.getElementById('card-grid');
-plugins.forEach(p => {
+// ── Render Card ──
+function renderCard(plugin) {
+    const favs = getFavs();
+    const isFav = !!favs[plugin.name];
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className = 'plugin-card';
+    card.dataset.plugin = plugin.name;
     card.innerHTML = `
-        <div class="card-name">${p.name}</div>
-        <div class="card-desc">${p.desc}</div>
+        <div class="plugin-header">
+            <div class="plugin-title-row">
+                <span class="plugin-name">${plugin.name}</span>
+                <span class="quality-score-badge ${plugin.quality === 'high' ? 'quality-high' : 'quality-mid'}">${plugin.qualityLabel}</span>
+            </div>
+            <div class="plugin-meta-row">
+                <span class="plugin-version">v${plugin.version}</span>
+                <span class="plugin-author">by ${plugin.author}</span>
+                <span class="source-badge ${plugin.source === 'curated' ? 'source-curated' : 'source-playground'}">${plugin.source}</span>
+            </div>
+        </div>
+        <div class="plugin-description">${plugin.desc}</div>
+        <div class="plugin-footer">
+            <div class="plugin-stats">
+                ${plugin.skills ? `<span class="stat-item">⚡ ${plugin.skills} Skills</span>` : ''}
+                ${plugin.skills && plugin.agents ? `<span class="stat-separator">·</span>` : ''}
+                ${plugin.agents ? `<span class="stat-item">🤖 ${plugin.agents} Agent${plugin.agents !== 1 ? 's' : ''}</span>` : ''}
+            </div>
+            <span class="category-badge">${plugin.category}</span>
+        </div>
         <div class="engagement-row">
-            <span class="engagement-item readonly" title="Likes (read-only — vote on Discussion)">
-                ${thumbUp}
-                <span class="eng-count">${p.likes}</span>
+            <span class="engagement-item readonly ${plugin.likes > 0 ? 'like-active' : ''}" title="Likes (read-only — vote on Discussion)">
+                ${ICONS.thumbUp}
+                <span class="eng-count">${plugin.likes}</span>
             </span>
-            <span class="engagement-item readonly" title="Dislikes (read-only — vote on Discussion)">
-                ${thumbDown}
-                <span class="eng-count">${p.dislikes}</span>
+            <span class="engagement-item readonly ${plugin.dislikes > 0 ? 'dislike-active' : ''}" title="Dislikes (read-only — vote on Discussion)">
+                ${ICONS.thumbDown}
+                <span class="eng-count">${plugin.dislikes}</span>
             </span>
-            <a href="${p.url}" target="_blank" rel="noopener" class="eng-discuss">💬 Vote on Discussion</a>
+            <button class="engagement-item interactive fav-btn ${isFav ? 'fav-active' : ''}" data-fav="${plugin.name}" title="Favorite (personal bookmark)">
+                ${isFav ? ICONS.heartFill : ICONS.heart}
+                <span class="eng-count fav-count">0</span>
+            </button>
+            <a href="${plugin.discussion}" target="_blank" rel="noopener" class="eng-discuss" title="Vote on Discussion">💬 Vote on Discussion</a>
         </div>
     `;
-    grid.appendChild(card);
+    return card;
+}
+
+// ── Render Grid ──
+function renderGrid() {
+    const grid = document.getElementById('plugin-grid');
+    grid.innerHTML = '';
+    PLUGINS.forEach(p => grid.appendChild(renderCard(p)));
+}
+
+// ── Detail Page ──
+function showDetail(pluginName) {
+    const plugin = PLUGINS.find(p => p.name === pluginName);
+    if (!plugin) return;
+    const favs = getFavs();
+    const isFav = !!favs[plugin.name];
+
+    document.getElementById('plugin-grid').style.display = 'none';
+    document.querySelector('.search-section').style.display = 'none';
+    document.querySelector('.hero').style.display = 'none';
+    document.querySelector('.demo-banner').style.display = 'none';
+    document.getElementById('how-section').style.display = 'none';
+
+    const dp = document.getElementById('detail-page');
+    dp.classList.add('visible');
+
+    document.getElementById('detail-content').innerHTML = `
+        <div class="detail-header">
+            <div class="detail-title">${plugin.name}</div>
+            <div class="detail-meta">
+                <span class="plugin-version">v${plugin.version}</span> · by ${plugin.author} ·
+                <span class="source-badge ${plugin.source === 'curated' ? 'source-curated' : 'source-playground'}">${plugin.source}</span> ·
+                <span class="quality-score-badge ${plugin.quality === 'high' ? 'quality-high' : 'quality-mid'}">${plugin.qualityLabel}</span>
+            </div>
+        </div>
+        <div class="detail-description">${plugin.desc}</div>
+
+        <div class="detail-vote-row">
+            <span class="engagement-item readonly ${plugin.likes > 0 ? 'like-active' : ''}" title="Read-only — vote on Discussion">
+                ${ICONS.thumbUp}
+                <span class="eng-count">${plugin.likes}</span>
+            </span>
+            <span class="engagement-item readonly ${plugin.dislikes > 0 ? 'dislike-active' : ''}" title="Read-only — vote on Discussion">
+                ${ICONS.thumbDown}
+                <span class="eng-count">${plugin.dislikes}</span>
+            </span>
+            <button class="engagement-item interactive fav-btn ${isFav ? 'fav-active' : ''}" data-fav="${plugin.name}" title="Favorite (personal bookmark)">
+                ${isFav ? ICONS.heartFill : ICONS.heart}
+                <span class="eng-count fav-count">0</span>
+            </button>
+            <a href="${plugin.discussion}" target="_blank" rel="noopener" class="eng-discuss">💬 Vote on Discussion</a>
+        </div>
+
+        ${plugin.skills || plugin.agents ? `
+        <div class="detail-section">
+            <h3 class="detail-section-title">Components</h3>
+            <div class="component-list">
+                ${Array.from({length: plugin.skills}, (_, i) => `
+                    <div class="component-item">
+                        <span class="component-icon">⚡</span>
+                        <span class="component-name">${plugin.name}-skill-${i + 1}</span>
+                        <span class="component-desc">Sample skill description</span>
+                    </div>
+                `).join('')}
+                ${Array.from({length: plugin.agents}, (_, i) => `
+                    <div class="component-item">
+                        <span class="component-icon">🤖</span>
+                        <span class="component-name">${plugin.name}-agent</span>
+                        <span class="component-desc">AI agent for ${plugin.category.toLowerCase()}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+        ` : ''}
+
+        <div class="detail-section">
+            <h3 class="detail-section-title">💬 Community Discussion</h3>
+            <div class="giscus-wrapper" id="giscus-container"></div>
+        </div>
+    `;
+
+    // Load Giscus
+    const container = document.getElementById('giscus-container');
+    const script = document.createElement('script');
+    script.src = 'https://giscus.app/client.js';
+    script.setAttribute('data-repo', 'LucasHua/giscus-voting-demo');
+    script.setAttribute('data-repo-id', 'R_kgDORZBeaQ');
+    script.setAttribute('data-category', 'General');
+    script.setAttribute('data-category-id', 'DIC_kwDORZBeac4C3N3A');
+    script.setAttribute('data-mapping', 'specific');
+    script.setAttribute('data-term', plugin.giscusTerm);
+    script.setAttribute('data-reactions-enabled', '1');
+    script.setAttribute('data-emit-metadata', '0');
+    script.setAttribute('data-input-position', 'top');
+    script.setAttribute('data-theme', 'dark_dimmed');
+    script.setAttribute('data-lang', 'en');
+    script.setAttribute('data-loading', 'lazy');
+    script.crossOrigin = 'anonymous';
+    script.async = true;
+    container.appendChild(script);
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function hideDetail() {
+    document.getElementById('detail-page').classList.remove('visible');
+    document.getElementById('plugin-grid').style.display = '';
+    document.querySelector('.search-section').style.display = '';
+    document.querySelector('.hero').style.display = '';
+    document.querySelector('.demo-banner').style.display = '';
+    document.getElementById('how-section').style.display = '';
+    // Clean up giscus scripts
+    document.querySelectorAll('script[src*="giscus.app"]').forEach(s => s.remove());
+}
+
+// ── Event Handlers ──
+document.addEventListener('click', (e) => {
+    // Back button
+    if (e.target.closest('#back-btn')) { hideDetail(); return; }
+
+    // Fav toggle
+    const favBtn = e.target.closest('.fav-btn');
+    if (favBtn) {
+        e.stopPropagation();
+        const name = favBtn.dataset.fav;
+        const isFav = toggleFav(name);
+        favBtn.classList.toggle('fav-active', isFav);
+        favBtn.innerHTML = `${isFav ? ICONS.heartFill : ICONS.heart}<span class="eng-count fav-count">0</span>`;
+        // Update all fav buttons for this plugin
+        document.querySelectorAll(`.fav-btn[data-fav="${name}"]`).forEach(btn => {
+            btn.classList.toggle('fav-active', isFav);
+            btn.innerHTML = `${isFav ? ICONS.heartFill : ICONS.heart}<span class="eng-count fav-count">0</span>`;
+        });
+        return;
+    }
+
+    // Discussion link — let it propagate naturally
+    if (e.target.closest('.eng-discuss')) return;
+
+    // Card click → detail
+    const card = e.target.closest('.plugin-card');
+    if (card) { showDetail(card.dataset.plugin); return; }
 });
+
+// Search filter
+document.getElementById('search-input').addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll('.plugin-card').forEach(card => {
+        card.style.display = card.dataset.plugin.includes(q) ? '' : 'none';
+    });
+});
+
+// Sort
+document.getElementById('sort-filter').addEventListener('change', (e) => {
+    const grid = document.getElementById('plugin-grid');
+    const cards = [...grid.children];
+    const favs = getFavs();
+    cards.sort((a, b) => {
+        const pa = PLUGINS.find(p => p.name === a.dataset.plugin);
+        const pb = PLUGINS.find(p => p.name === b.dataset.plugin);
+        if (e.target.value === 'mostLiked') return pb.likes - pa.likes;
+        if (e.target.value === 'myFavorites') return (favs[pb.name] ? 1 : 0) - (favs[pa.name] ? 1 : 0);
+        return pa.name.localeCompare(pb.name);
+    });
+    cards.forEach(c => grid.appendChild(c));
+});
+
+// ── Init ──
+renderGrid();
 </script>
 
 </body>

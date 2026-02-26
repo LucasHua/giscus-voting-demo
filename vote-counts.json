@@ -1,0 +1,67 @@
+{
+  "sfi-dev-toolkit": {
+    "url": "https://github.com/LucasHua/giscus-voting-demo/discussions/4",
+    "reactions": {
+      "CONFUSED": 0,
+      "HOORAY": 1,
+      "HEART": 1,
+      "EYES": 0,
+      "THUMBS_DOWN": 0,
+      "ROCKET": 1,
+      "THUMBS_UP": 1,
+      "LAUGH": 0
+    }
+  },
+  "code-reviewer": {
+    "url": "https://github.com/LucasHua/giscus-voting-demo/discussions/2",
+    "reactions": {
+      "CONFUSED": 0,
+      "HOORAY": 0,
+      "HEART": 0,
+      "EYES": 1,
+      "THUMBS_DOWN": 0,
+      "ROCKET": 1,
+      "THUMBS_UP": 1,
+      "LAUGH": 0
+    }
+  },
+  "bug-fixer": {
+    "url": "https://github.com/LucasHua/giscus-voting-demo/discussions/1",
+    "reactions": {
+      "CONFUSED": 0,
+      "HOORAY": 1,
+      "HEART": 1,
+      "EYES": 0,
+      "THUMBS_DOWN": 0,
+      "ROCKET": 1,
+      "THUMBS_UP": 1,
+      "LAUGH": 0
+    }
+  },
+  "rubber-duck": {
+    "url": "https://github.com/LucasHua/giscus-voting-demo/discussions/3",
+    "reactions": {
+      "CONFUSED": 0,
+      "HOORAY": 0,
+      "HEART": 1,
+      "EYES": 0,
+      "THUMBS_DOWN": 0,
+      "ROCKET": 0,
+      "THUMBS_UP": 1,
+      "LAUGH": 1
+    }
+  },
+  "deep-review": {
+    "url": "https://github.com/LucasHua/giscus-voting-demo/discussions/5",
+    "reactions": {
+      "CONFUSED": 0,
+      "HOORAY": 0,
+      "HEART": 0,
+      "EYES": 1,
+      "THUMBS_DOWN": 0,
+      "ROCKET": 0,
+      "THUMBS_UP": 1,
+      "LAUGH": 0
+    }
+  }
+}

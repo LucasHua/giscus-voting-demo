@@ -903,18 +903,19 @@ const PLUGINS = [
 ];
 
 // ── Render reaction pills (read-only spans, not clickable) ──
+// Cards show only 👍/👎; detail page shows all reactions via Giscus.
+const CARD_REACTIONS = ['THUMBS_UP', 'THUMBS_DOWN'];
 function renderReactions(plugin) {
     const reactions = plugin.reactions || {};
-    const pills = Object.entries(reactions)
-        .filter(([, count]) => count > 0)
-        .map(([type, count]) => {
+    const pills = CARD_REACTIONS
+        .filter(type => (reactions[type] || 0) > 0)
+        .map(type => {
             const r = REACTION_MAP[type];
-            if (!r) return '';
+            const count = reactions[type];
             return `<span class="reaction-pill readonly" title="${r.label}">${r.emoji} ${count}</span>`;
         })
         .join('');
-    const total = Object.values(reactions).reduce((s, c) => s + c, 0);
-    if (total === 0) return '';
+    if (!pills) return '';
     return pills;
 }
 

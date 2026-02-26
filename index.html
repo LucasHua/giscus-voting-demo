@@ -411,20 +411,12 @@
             border: 1px solid var(--color-border);
             color: var(--color-text-secondary);
             text-decoration: none;
-            transition: all 0.15s;
-            cursor: pointer;
             white-space: nowrap;
         }
-        .reaction-pill:hover {
-            border-color: var(--color-accent);
-            background: rgba(0,120,212,0.1);
-        }
-        .reaction-pill.reaction-empty {
-            opacity: 0.5;
-            font-style: italic;
-        }
-        .reaction-pill.reaction-empty:hover {
-            opacity: 0.8;
+        .reaction-pill.readonly {
+            cursor: default;
+            pointer-events: none;
+            opacity: 0.7;
         }
 
         /* ── Detail Page ── */
@@ -886,7 +878,7 @@ const PLUGINS = [
     },
 ];
 
-// ── Render reaction pills (only reactions with count > 0) ──
+// ── Render reaction pills (read-only spans, not clickable) ──
 function renderReactions(plugin) {
     const reactions = plugin.reactions || {};
     const pills = Object.entries(reactions)
@@ -894,13 +886,11 @@ function renderReactions(plugin) {
         .map(([type, count]) => {
             const r = REACTION_MAP[type];
             if (!r) return '';
-            return `<a href="${plugin.discussion}" target="_blank" rel="noopener" class="reaction-pill" title="${r.label}">${r.emoji} ${count}</a>`;
+            return `<span class="reaction-pill readonly" title="${r.label}">${r.emoji} ${count}</span>`;
         })
         .join('');
     const total = Object.values(reactions).reduce((s, c) => s + c, 0);
-    if (total === 0) {
-        return `<a href="${plugin.discussion}" target="_blank" rel="noopener" class="reaction-pill reaction-empty" title="Be the first to react!">😶 No reactions yet</a>`;
-    }
+    if (total === 0) return '';
     return pills;
 }
 
@@ -930,6 +920,7 @@ function renderCard(plugin) {
             </div>
             <span class="category-badge">${plugin.category}</span>
         </div>
+        ${renderReactions(plugin) ? `<div class="engagement-row">${renderReactions(plugin)}</div>` : ''}
     `;
     return card;
 }

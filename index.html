@@ -824,7 +824,7 @@ const PLUGINS = [
         quality: 'high',
         qualityLabel: '★ 4.8',
         category: 'Development',
-        skills: 3, agents: 1,
+        skills: 3, agents: 1, installs: 1247,
         discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/1',
         giscusTerm: 'Votes: bug-fixer',
         reactions: {}, // loaded from API
@@ -838,7 +838,7 @@ const PLUGINS = [
         quality: 'high',
         qualityLabel: '★ 4.6',
         category: 'Development',
-        skills: 2, agents: 1,
+        skills: 2, agents: 1, installs: 892,
         discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/2',
         giscusTerm: 'Votes: code-reviewer',
         reactions: {},
@@ -852,7 +852,7 @@ const PLUGINS = [
         quality: 'mid',
         qualityLabel: '★ 3.9',
         category: 'Productivity',
-        skills: 1, agents: 1,
+        skills: 1, agents: 1, installs: 534,
         discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/3',
         giscusTerm: 'Votes: rubber-duck',
         reactions: {},
@@ -866,7 +866,7 @@ const PLUGINS = [
         quality: 'high',
         qualityLabel: '★ 4.7',
         category: 'Security',
-        skills: 4, agents: 0,
+        skills: 4, agents: 0, installs: 2031,
         discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/4',
         giscusTerm: 'Votes: sfi-dev-toolkit',
         reactions: {},
@@ -880,7 +880,7 @@ const PLUGINS = [
         quality: 'mid',
         qualityLabel: '★ 4.0',
         category: 'Documentation',
-        skills: 2, agents: 0,
+        skills: 2, agents: 0, installs: 318,
         discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/5',
         giscusTerm: 'Votes: deep-review',
         reactions: {},
@@ -894,7 +894,7 @@ const PLUGINS = [
         quality: 'mid',
         qualityLabel: '★ 3.7',
         category: 'Development',
-        skills: 2, agents: 1,
+        skills: 2, agents: 1, installs: 156,
         discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/1',
         giscusTerm: 'Votes: bug-fixer',
         reactions: {},
@@ -951,6 +951,8 @@ function renderCard(plugin) {
         <div class="plugin-description">${plugin.desc}</div>
         <div class="plugin-footer">
             <div class="plugin-stats">
+                <span class="stat-item">📥 ${plugin.installs.toLocaleString()}</span>
+                <span class="stat-separator">·</span>
                 ${plugin.skills ? `<span class="stat-item">⚡ ${plugin.skills} Skills</span>` : ''}
                 ${plugin.skills && plugin.agents ? `<span class="stat-separator">·</span>` : ''}
                 ${plugin.agents ? `<span class="stat-item">🤖 ${plugin.agents} Agent${plugin.agents !== 1 ? 's' : ''}</span>` : ''}

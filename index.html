@@ -671,7 +671,7 @@
         .component-name { color: var(--color-text-primary); font-weight: 500; }
         .component-desc { color: var(--color-text-muted); font-size: 0.8rem; margin-left: auto; }
 
-        /* ── Star Rating Widget ── */
+        /* ── Poll Rating Widget ── */
         .rating-section {
             background: var(--color-bg-tertiary);
             border: 1px solid var(--color-border);
@@ -686,104 +686,74 @@
         }
         .rating-section-desc {
             font-size: 0.85rem;
-            color: var(--color-text-muted);
+            color: var(--color-text-secondary);
             margin-bottom: var(--spacing-md);
+            line-height: 1.6;
         }
-        .star-rating {
-            display: flex;
-            gap: 6px;
-            margin-bottom: var(--spacing-md);
-        }
-        .star-btn {
-            background: none;
-            border: 2px solid var(--color-border);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            font-size: 1.5rem;
-            padding: 6px 10px;
-            transition: all 0.15s ease;
-            color: var(--color-text-muted);
-            line-height: 1;
-        }
-        .star-btn:hover {
-            border-color: var(--color-accent);
-            background: rgba(0,120,212,0.1);
-        }
-        .star-btn.selected {
-            border-color: #f0a830;
-            background: rgba(240,168,48,0.15);
-            color: var(--color-text-primary);
-        }
-        .star-btn .star-label {
-            display: block;
-            font-size: 0.65rem;
-            margin-top: 2px;
-            color: var(--color-text-muted);
-        }
-        .rating-summary {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-md);
-            padding: var(--spacing-md);
-            background: var(--color-bg-secondary);
-            border-radius: var(--radius-sm);
-        }
-        .rating-avg {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #f0a830;
-        }
-        .rating-bars {
-            flex: 1;
+        .poll-options {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 8px;
+            margin-bottom: var(--spacing-md);
         }
-        .rating-bar-row {
+        .poll-option {
             display: flex;
             align-items: center;
             gap: var(--spacing-sm);
-            font-size: 0.75rem;
-            color: var(--color-text-muted);
-        }
-        .rating-bar-row .bar-label {
-            width: 16px;
-            text-align: right;
-        }
-        .rating-bar-track {
-            flex: 1;
-            height: 8px;
-            background: var(--color-bg-elevated);
-            border-radius: 4px;
+            cursor: pointer;
+            padding: 8px 12px;
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            transition: all 0.15s ease;
+            position: relative;
             overflow: hidden;
         }
-        .rating-bar-fill {
-            height: 100%;
-            background: #f0a830;
-            border-radius: 4px;
-            transition: width 0.3s ease;
+        .poll-option:hover {
+            border-color: var(--color-accent);
         }
-        .rating-bar-row .bar-count {
-            width: 24px;
-            text-align: right;
+        .poll-option.voted {
+            border-color: #f0a830;
         }
-        .rating-total {
+        .poll-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: rgba(240,168,48,0.12);
+            border-radius: var(--radius-sm);
+            transition: width 0.4s ease;
+        }
+        .poll-option-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        .poll-option-label {
+            font-size: 0.9rem;
+            color: var(--color-text-primary);
+        }
+        .poll-option-pct {
             font-size: 0.8rem;
             color: var(--color-text-muted);
-        }
-        .rating-thanks {
-            font-size: 0.85rem;
-            color: var(--color-green);
-            margin-top: var(--spacing-sm);
-            display: none;
-        }
-        .rating-thanks.visible { display: block; }
-        /* Card community rating badge */
-        .community-rating-badge {
-            font-size: 0.75rem;
-            color: #f0a830;
             font-weight: 500;
         }
+        .poll-total {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-top: var(--spacing-sm);
+        }
+        .poll-github-link {
+            display: inline-block;
+            margin-top: var(--spacing-md);
+            font-size: 0.8rem;
+            color: var(--color-accent-secondary);
+            text-decoration: none;
+        }
+        .poll-github-link:hover { text-decoration: underline; }
 
         /* ── Footer ── */
         .footer {
@@ -1096,83 +1066,32 @@ function toggleFav(name) {
     return !!favs[name];
 }
 
-// ── Community Ratings (localStorage, simulates poll data) ──
-const RATINGS_KEY = 'demo-ratings';
-// Seed data simulates existing community votes
-const SEED_RATINGS = {
-    'bug-fixer':     { 1: 1, 2: 2, 3: 6, 4: 18, 5: 24 },
-    'code-reviewer': { 1: 0, 2: 1, 3: 4, 4: 15, 5: 20 },
-    'rubber-duck':   { 1: 2, 2: 5, 3: 8, 4: 6, 5: 3 },
-    'secure-scan':   { 1: 0, 2: 1, 3: 3, 4: 12, 5: 22 },
-    'doc-writer':    { 1: 1, 2: 3, 3: 7, 4: 9, 5: 5 },
-    'perf-profiler': { 1: 3, 2: 4, 3: 5, 4: 3, 5: 2 },
+// ── Community Poll Ratings (simulated GitHub Discussion polls) ──
+const POLL_DATA = {
+    'bug-fixer':     { options: { '⭐ Poor': 1, '⭐⭐ Fair': 2, '⭐⭐⭐ Good': 6, '⭐⭐⭐⭐ Great': 18, '⭐⭐⭐⭐⭐ Excellent': 24 } },
+    'code-reviewer': { options: { '⭐ Poor': 0, '⭐⭐ Fair': 1, '⭐⭐⭐ Good': 4, '⭐⭐⭐⭐ Great': 15, '⭐⭐⭐⭐⭐ Excellent': 20 } },
+    'rubber-duck':   { options: { '⭐ Poor': 2, '⭐⭐ Fair': 5, '⭐⭐⭐ Good': 8, '⭐⭐⭐⭐ Great': 6, '⭐⭐⭐⭐⭐ Excellent': 3 } },
+    'secure-scan':   { options: { '⭐ Poor': 0, '⭐⭐ Fair': 1, '⭐⭐⭐ Good': 3, '⭐⭐⭐⭐ Great': 12, '⭐⭐⭐⭐⭐ Excellent': 22 } },
+    'doc-writer':    { options: { '⭐ Poor': 1, '⭐⭐ Fair': 3, '⭐⭐⭐ Good': 7, '⭐⭐⭐⭐ Great': 9, '⭐⭐⭐⭐⭐ Excellent': 5 } },
+    'perf-profiler': { options: { '⭐ Poor': 3, '⭐⭐ Fair': 4, '⭐⭐⭐ Good': 5, '⭐⭐⭐⭐ Great': 3, '⭐⭐⭐⭐⭐ Excellent': 2 } },
 };
-function getRatings() {
-    try { return JSON.parse(localStorage.getItem(RATINGS_KEY)) || {}; } catch { return {}; }
-}
-function getRatingData(pluginName) {
-    const all = getRatings();
-    const seed = SEED_RATINGS[pluginName] || { 1:0, 2:0, 3:0, 4:0, 5:0 };
-    const user = all[pluginName] || {};
-    // Merge seed + any extra user votes
-    return {
-        counts: { 1: seed[1], 2: seed[2], 3: seed[3], 4: seed[4], 5: seed[5] },
-        userVote: user.vote || 0,
-    };
-}
-function submitRating(pluginName, value) {
-    const all = getRatings();
-    const prev = all[pluginName]?.vote || 0;
-    // Adjust seed counts
-    const seed = SEED_RATINGS[pluginName] || { 1:0, 2:0, 3:0, 4:0, 5:0 };
-    if (prev > 0) seed[prev] = Math.max(0, seed[prev] - 1);
-    seed[value] = (seed[value] || 0) + 1;
-    SEED_RATINGS[pluginName] = seed;
-    all[pluginName] = { vote: value };
-    localStorage.setItem(RATINGS_KEY, JSON.stringify(all));
-}
-function calcAvg(counts) {
-    let total = 0, sum = 0;
-    for (let i = 1; i <= 5; i++) { total += counts[i]; sum += counts[i] * i; }
-    return total === 0 ? 0 : (sum / total);
-}
-function renderRatingSummary(pluginName) {
-    const el = document.getElementById('rating-summary');
+function renderPollWidget(pluginName) {
+    const el = document.getElementById('poll-widget');
     if (!el) return;
-    const { counts, userVote } = getRatingData(pluginName);
-    const avg = calcAvg(counts);
-    let total = 0;
-    for (let i = 1; i <= 5; i++) total += counts[i];
-    const maxCount = Math.max(...Object.values(counts), 1);
-    el.innerHTML = `
-        <div style="text-align:center">
-            <div class="rating-avg">${avg > 0 ? avg.toFixed(1) : '—'}</div>
-            <div class="rating-total">${total} rating${total !== 1 ? 's' : ''}</div>
-        </div>
-        <div class="rating-bars">
-            ${[5,4,3,2,1].map(i => `
-                <div class="rating-bar-row">
-                    <span class="bar-label">${i}★</span>
-                    <div class="rating-bar-track"><div class="rating-bar-fill" style="width:${total > 0 ? (counts[i]/maxCount*100) : 0}%"></div></div>
-                    <span class="bar-count">${counts[i]}</span>
-                </div>
-            `).join('')}
-        </div>
-    `;
-    // Highlight user's selected star
-    document.querySelectorAll('#star-rating .star-btn').forEach(btn => {
-        btn.classList.toggle('selected', parseInt(btn.dataset.value) === userVote);
-    });
-    // Show thanks if voted
-    const thanks = document.getElementById('rating-thanks');
-    if (thanks) thanks.classList.toggle('visible', userVote > 0);
-}
-function getCommunityRating(pluginName) {
-    const { counts } = getRatingData(pluginName);
-    const avg = calcAvg(counts);
-    let total = 0;
-    for (let i = 1; i <= 5; i++) total += counts[i];
-    return { avg, total };
+    const poll = POLL_DATA[pluginName];
+    if (!poll) { el.innerHTML = '<p style="color:var(--color-text-muted);font-size:0.85rem;">No poll data available.</p>'; return; }
+    const opts = poll.options;
+    const total = Object.values(opts).reduce((a, b) => a + b, 0);
+    el.innerHTML = Object.entries(opts).map(([label, count]) => {
+        const pct = total > 0 ? Math.round(count / total * 100) : 0;
+        return `<div class="poll-option">
+            <div class="poll-bar" style="width:${pct}%"></div>
+            <div class="poll-option-content">
+                <span class="poll-option-label">${label}</span>
+                <span class="poll-option-pct">${pct}% (${count})</span>
+            </div>
+        </div>`;
+    }).join('') + `<p class="poll-total">${total} votes · Powered by GitHub Discussion Polls</p>`;
 }
 
 // ── Render Card ──
@@ -1182,14 +1101,11 @@ function renderCard(plugin) {
     card.className = 'plugin-card';
     card.dataset.plugin = plugin.name;
     const reactionHtml = renderReactions(plugin);
-    const cr = getCommunityRating(plugin.name);
-    const communityBadge = cr.total > 0 ? `<span class="community-rating-badge" title="Community rating: ${cr.avg.toFixed(1)} from ${cr.total} votes">⭐ ${cr.avg.toFixed(1)}</span>` : '';
     card.innerHTML = `
         <div class="plugin-header">
             <div class="plugin-title-row">
                 <span class="plugin-name">${plugin.name}</span>
                 <span class="quality-score-badge ${plugin.quality === 'high' ? 'quality-high' : 'quality-mid'}">${plugin.qualityLabel}</span>
-                ${communityBadge}
             </div>
             <div class="plugin-meta-row">
                 <span class="plugin-version">v${plugin.version}</span>
@@ -1294,17 +1210,9 @@ function showDetail(pluginName, initialTab = 'overview') {
 
         <div class="detail-tabpanel" role="tabpanel" id="panel-discussion" aria-labelledby="tab-discussion">
             <div class="rating-section" id="rating-section">
-                <h3 class="rating-section-title">⭐ Rate this plugin</h3>
-                <p class="rating-section-desc">How would you rate your experience with <strong>${plugin.name}</strong>?</p>
-                <div class="star-rating" id="star-rating" data-plugin="${plugin.name}">
-                    <button class="star-btn" data-value="1" title="1 — Poor">⭐<span class="star-label">Poor</span></button>
-                    <button class="star-btn" data-value="2" title="2 — Fair">⭐⭐<span class="star-label">Fair</span></button>
-                    <button class="star-btn" data-value="3" title="3 — Good">⭐⭐⭐<span class="star-label">Good</span></button>
-                    <button class="star-btn" data-value="4" title="4 — Great">⭐⭐⭐⭐<span class="star-label">Great</span></button>
-                    <button class="star-btn" data-value="5" title="5 — Excellent">⭐⭐⭐⭐⭐<span class="star-label">Excellent</span></button>
-                </div>
-                <p class="rating-thanks" id="rating-thanks">✅ Thanks for rating!</p>
-                <div class="rating-summary" id="rating-summary"></div>
+                <h3 class="rating-section-title">📊 Community Rating</h3>
+                <p class="rating-section-desc">How would you rate <strong>${plugin.name}</strong>? Vote in the poll below — results update in real time via GitHub Discussion Polls.</p>
+                <div class="poll-options" id="poll-widget"></div>
             </div>
             <div class="plugin-info-card">
                 <p class="plugin-info-desc">${plugin.desc}</p>
@@ -1344,7 +1252,7 @@ function switchDetailTab(tabName, plugin) {
     // Lazy-load Giscus when Discussion tab first activated
     if (tabName === 'discussion') {
         loadGiscus(plugin);
-        renderRatingSummary(plugin.name);
+        renderPollWidget(plugin.name);
     }
 }
 
@@ -1386,22 +1294,6 @@ function hideDetail() {
 document.addEventListener('click', (e) => {
     // Back button
     if (e.target.closest('#back-btn')) { hideDetail(); return; }
-
-    // Star rating click
-    const starBtn = e.target.closest('.star-btn');
-    if (starBtn) {
-        e.stopPropagation();
-        const rating = document.getElementById('star-rating');
-        if (rating) {
-            const pluginName = rating.dataset.plugin;
-            const value = parseInt(starBtn.dataset.value);
-            submitRating(pluginName, value);
-            renderRatingSummary(pluginName);
-            // Re-render grid to update community badge on card
-            renderGrid();
-        }
-        return;
-    }
 
     // Fav toggle
     const favBtn = e.target.closest('.fav-btn');

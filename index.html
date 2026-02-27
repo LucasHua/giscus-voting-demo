@@ -878,7 +878,7 @@ const PLUGINS = [
         category: 'Development',
         skills: 3, agents: 1, installs: 1247,
         discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/6',
-        giscusTerm: 'Votes: bug-fixer',
+        giscusTerm: 'Plugin: bug-fixer',
         reactions: {}, // loaded from API
     },
     {
@@ -896,7 +896,7 @@ const PLUGINS = [
         category: 'Development',
         skills: 2, agents: 1, installs: 892,
         discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/7',
-        giscusTerm: 'Votes: code-reviewer',
+        giscusTerm: 'Plugin: code-reviewer',
         reactions: {},
     },
     {
@@ -910,7 +910,7 @@ const PLUGINS = [
         category: 'Productivity',
         skills: 1, agents: 1, installs: 534,
         discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/8',
-        giscusTerm: 'Votes: rubber-duck',
+        giscusTerm: 'Plugin: rubber-duck',
         reactions: {},
     },
     {
@@ -924,7 +924,7 @@ const PLUGINS = [
         category: 'Security',
         skills: 4, agents: 0, installs: 2031,
         discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/9',
-        giscusTerm: 'Votes: secure-scan',
+        giscusTerm: 'Plugin: secure-scan',
         reactions: {},
     },
     {
@@ -938,7 +938,7 @@ const PLUGINS = [
         category: 'Documentation',
         skills: 2, agents: 0, installs: 318,
         discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/10',
-        giscusTerm: 'Votes: deep-review',
+        giscusTerm: 'Plugin: deep-review',
         reactions: {},
     },
     {
@@ -952,7 +952,7 @@ const PLUGINS = [
         category: 'Development',
         skills: 2, agents: 1, installs: 156,
         discussion: 'https://github.com/LucasHua/giscus-voting-demo/discussions/11',
-        giscusTerm: 'Votes: bug-hunter',
+        giscusTerm: 'Plugin: bug-hunter',
         reactions: {},
     },
 ];
@@ -1298,7 +1298,7 @@ async function loadReactions() {
             if (resp.ok) {
                 const counts = await resp.json();
                 for (const p of PLUGINS) {
-                    const discName = p.giscusTerm.replace('Votes: ', '');
+                    const discName = p.giscusTerm.replace('Plugin: ', '');
                     if (counts[discName]) {
                         p.reactions = counts[discName].reactions || {};
                         if (counts[discName].url) p.discussion = counts[discName].url;

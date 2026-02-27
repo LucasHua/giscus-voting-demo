@@ -532,6 +532,36 @@
             padding: 4px 12px;
         }
 
+        /* Detail source tabs (Curated / Playground) */
+        .detail-source-tabs {
+            display: flex;
+            gap: var(--spacing-xs);
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: var(--spacing-md);
+        }
+        .detail-source-tab {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--color-text-muted);
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .detail-source-tab:hover { color: var(--color-text-secondary); }
+        .detail-source-tab.active {
+            color: var(--color-accent);
+            border-bottom-color: var(--color-accent);
+        }
+        .source-tab-version {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--color-text-muted);
+            margin-left: 4px;
+        }
+
         /* Detail tabs */
         .detail-tabs {
             display: flex;
@@ -839,6 +869,10 @@ const PLUGINS = [
         version: '1.2.0',
         author: 'Alice Zhang',
         source: 'curated',
+        sources: [
+            { key: 'curated', label: 'Curated', badge: '🟢', version: '1.2.0' },
+            { key: 'playground', label: 'Playground', badge: '🟣', version: '1.3.0-beta' },
+        ],
         quality: 'high',
         qualityLabel: '★ 4.8',
         category: 'Development',
@@ -853,6 +887,10 @@ const PLUGINS = [
         version: '2.0.1',
         author: 'Bob Kim',
         source: 'curated',
+        sources: [
+            { key: 'curated', label: 'Curated', badge: '🟢', version: '2.0.1' },
+            { key: 'playground', label: 'Playground', badge: '🟣', version: '2.1.0-rc1' },
+        ],
         quality: 'high',
         qualityLabel: '★ 4.6',
         category: 'Development',
@@ -1025,6 +1063,9 @@ function showDetail(pluginName, initialTab = 'overview') {
                 <span class="quality-score-badge ${plugin.quality === 'high' ? 'quality-high' : 'quality-mid'}">${plugin.qualityLabel}</span>
             </div>
         </div>
+        ${plugin.sources ? `<div class="detail-source-tabs" role="tablist">
+            ${plugin.sources.map(src => `<button class="detail-source-tab ${src.key === plugin.source ? 'active' : ''}" data-source-key="${src.key}" role="tab" aria-selected="${src.key === plugin.source}">${src.badge} ${src.label}<span class="source-tab-version">v${src.version}</span></button>`).join('')}
+        </div>` : ''}
         <div class="detail-tabs" role="tablist" aria-label="Plugin detail tabs">
             <button class="detail-tab" role="tab" id="tab-overview" aria-selected="true" aria-controls="panel-overview">Overview</button>
             <button class="detail-tab" role="tab" id="tab-discussion" aria-selected="false" aria-controls="panel-discussion">💬 Discussions</button>

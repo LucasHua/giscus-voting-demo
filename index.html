@@ -671,90 +671,6 @@
         .component-name { color: var(--color-text-primary); font-weight: 500; }
         .component-desc { color: var(--color-text-muted); font-size: 0.8rem; margin-left: auto; }
 
-        /* ── Poll Rating Widget ── */
-        .rating-section {
-            background: var(--color-bg-tertiary);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            padding: var(--spacing-lg);
-            margin-bottom: var(--spacing-lg);
-        }
-        .rating-section-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: var(--spacing-sm);
-        }
-        .rating-section-desc {
-            font-size: 0.85rem;
-            color: var(--color-text-secondary);
-            margin-bottom: var(--spacing-md);
-            line-height: 1.6;
-        }
-        .poll-options {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: var(--spacing-md);
-        }
-        .poll-option {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            cursor: pointer;
-            padding: 8px 12px;
-            background: var(--color-bg-secondary);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-sm);
-            transition: all 0.15s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .poll-option:hover {
-            border-color: var(--color-accent);
-        }
-        .poll-option.voted {
-            border-color: #f0a830;
-        }
-        .poll-bar {
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            background: rgba(240,168,48,0.12);
-            border-radius: var(--radius-sm);
-            transition: width 0.4s ease;
-        }
-        .poll-option-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            position: relative;
-            z-index: 1;
-        }
-        .poll-option-label {
-            font-size: 0.9rem;
-            color: var(--color-text-primary);
-        }
-        .poll-option-pct {
-            font-size: 0.8rem;
-            color: var(--color-text-muted);
-            font-weight: 500;
-        }
-        .poll-total {
-            font-size: 0.8rem;
-            color: var(--color-text-muted);
-            margin-top: var(--spacing-sm);
-        }
-        .poll-github-link {
-            display: inline-block;
-            margin-top: var(--spacing-md);
-            font-size: 0.8rem;
-            color: var(--color-accent-secondary);
-            text-decoration: none;
-        }
-        .poll-github-link:hover { text-decoration: underline; }
-
         /* ── Footer ── */
         .footer {
             border-top: 1px solid var(--color-border);
@@ -1066,34 +982,6 @@ function toggleFav(name) {
     return !!favs[name];
 }
 
-// ── Community Poll Ratings (simulated GitHub Discussion polls) ──
-const POLL_DATA = {
-    'bug-fixer':     { options: { '⭐ Poor': 1, '⭐⭐ Fair': 2, '⭐⭐⭐ Good': 6, '⭐⭐⭐⭐ Great': 18, '⭐⭐⭐⭐⭐ Excellent': 24 } },
-    'code-reviewer': { options: { '⭐ Poor': 0, '⭐⭐ Fair': 1, '⭐⭐⭐ Good': 4, '⭐⭐⭐⭐ Great': 15, '⭐⭐⭐⭐⭐ Excellent': 20 } },
-    'rubber-duck':   { options: { '⭐ Poor': 2, '⭐⭐ Fair': 5, '⭐⭐⭐ Good': 8, '⭐⭐⭐⭐ Great': 6, '⭐⭐⭐⭐⭐ Excellent': 3 } },
-    'secure-scan':   { options: { '⭐ Poor': 0, '⭐⭐ Fair': 1, '⭐⭐⭐ Good': 3, '⭐⭐⭐⭐ Great': 12, '⭐⭐⭐⭐⭐ Excellent': 22 } },
-    'doc-writer':    { options: { '⭐ Poor': 1, '⭐⭐ Fair': 3, '⭐⭐⭐ Good': 7, '⭐⭐⭐⭐ Great': 9, '⭐⭐⭐⭐⭐ Excellent': 5 } },
-    'perf-profiler': { options: { '⭐ Poor': 3, '⭐⭐ Fair': 4, '⭐⭐⭐ Good': 5, '⭐⭐⭐⭐ Great': 3, '⭐⭐⭐⭐⭐ Excellent': 2 } },
-};
-function renderPollWidget(pluginName) {
-    const el = document.getElementById('poll-widget');
-    if (!el) return;
-    const poll = POLL_DATA[pluginName];
-    if (!poll) { el.innerHTML = '<p style="color:var(--color-text-muted);font-size:0.85rem;">No poll data available.</p>'; return; }
-    const opts = poll.options;
-    const total = Object.values(opts).reduce((a, b) => a + b, 0);
-    el.innerHTML = Object.entries(opts).map(([label, count]) => {
-        const pct = total > 0 ? Math.round(count / total * 100) : 0;
-        return `<div class="poll-option">
-            <div class="poll-bar" style="width:${pct}%"></div>
-            <div class="poll-option-content">
-                <span class="poll-option-label">${label}</span>
-                <span class="poll-option-pct">${pct}% (${count})</span>
-            </div>
-        </div>`;
-    }).join('') + `<p class="poll-total">${total} votes · Powered by GitHub Discussion Polls</p>`;
-}
-
 // ── Render Card ──
 function renderCard(plugin) {
     const isFav = !!getFavs()[plugin.name];
@@ -1209,11 +1097,6 @@ function showDetail(pluginName, initialTab = 'overview') {
         </div>
 
         <div class="detail-tabpanel" role="tabpanel" id="panel-discussion" aria-labelledby="tab-discussion">
-            <div class="rating-section" id="rating-section">
-                <h3 class="rating-section-title">📊 Community Rating</h3>
-                <p class="rating-section-desc">How would you rate <strong>${plugin.name}</strong>? Vote in the poll below — results update in real time via GitHub Discussion Polls.</p>
-                <div class="poll-options" id="poll-widget"></div>
-            </div>
             <div class="plugin-info-card">
                 <p class="plugin-info-desc">${plugin.desc}</p>
                 ${plugin.discussion ? '<a class="plugin-info-link" href="' + plugin.discussion + '" target="_blank" rel="noopener">View full discussion on GitHub ↗</a>' : ''}
@@ -1252,7 +1135,6 @@ function switchDetailTab(tabName, plugin) {
     // Lazy-load Giscus when Discussion tab first activated
     if (tabName === 'discussion') {
         loadGiscus(plugin);
-        renderPollWidget(plugin.name);
     }
 }
 

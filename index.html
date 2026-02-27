@@ -394,47 +394,48 @@
         .engagement-row {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
             padding-top: var(--spacing-sm);
             margin-top: var(--spacing-sm);
             border-top: 1px solid var(--color-border);
-            flex-wrap: wrap;
+            font-size: 0.8125rem;
+            color: var(--color-text-muted);
+        }
+        .engagement-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
         .reaction-pill {
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            font-size: 0.75rem;
-            padding: 2px 8px;
-            border-radius: 9999px;
-            background: var(--color-bg-tertiary);
-            border: 1px solid var(--color-border);
-            color: var(--color-text-secondary);
-            text-decoration: none;
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 0.8125rem;
+            color: var(--color-text-muted);
+            cursor: pointer;
             white-space: nowrap;
         }
-        .reaction-pill.readonly {
-            cursor: pointer;
-            opacity: 0.85;
+        .reaction-pill:hover {
+            color: var(--color-text-secondary);
         }
         .fav-btn {
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            font-size: 0.8rem;
-            padding: 2px 6px;
-            border-radius: 9999px;
+            font-size: 0.8125rem;
+            padding: 0;
             background: none;
-            border: 1px solid transparent;
+            border: none;
             color: var(--color-text-muted);
             cursor: pointer;
             margin-left: auto;
-            transition: all 0.15s;
+            transition: color 0.15s;
         }
         .fav-btn:hover {
             color: var(--color-pink);
-            background: rgba(219,97,162,0.1);
-            border-color: rgba(219,97,162,0.3);
         }
         .fav-btn.active {
             color: var(--color-pink);
@@ -637,39 +638,6 @@
         }
 
         /* ── How it works ── */
-        .how-section {
-            margin: var(--spacing-xl) 0;
-        }
-        .how-section h2 {
-            font-size: 1.25rem;
-            margin-bottom: var(--spacing-md);
-        }
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: var(--spacing-md);
-        }
-        .step {
-            background: var(--color-bg-secondary);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-md);
-            padding: var(--spacing-md);
-        }
-        .step-num {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 26px;
-            height: 26px;
-            background: var(--color-accent);
-            color: var(--color-bg-primary);
-            border-radius: 50%;
-            font-weight: 700;
-            font-size: 0.8rem;
-            margin-bottom: var(--spacing-sm);
-        }
-        .step h3 { font-size: 0.9rem; margin-bottom: var(--spacing-xs); }
-        .step p { color: var(--color-text-muted); font-size: 0.8rem; }
         code {
             background: rgba(110,118,129,0.2);
             padding: 2px 6px;
@@ -677,27 +645,6 @@
             font-size: 0.85em;
             font-family: 'SFMono-Regular', Consolas, monospace;
         }
-
-        /* ── Setup callout ── */
-        .setup-callout {
-            background: linear-gradient(135deg, rgba(0,120,212,0.08), rgba(61,203,255,0.05));
-            border: 1px solid rgba(0,120,212,0.25);
-            border-radius: var(--radius-md);
-            padding: var(--spacing-lg);
-            margin: var(--spacing-lg) 0;
-        }
-        .setup-callout h3 {
-            color: var(--color-accent-secondary);
-            margin-bottom: var(--spacing-sm);
-        }
-        .setup-callout ol {
-            color: var(--color-text-secondary);
-            font-size: 0.875rem;
-            padding-left: 1.5rem;
-            line-height: 2;
-        }
-        .setup-callout a { color: var(--color-accent-secondary); text-decoration: none; }
-        .setup-callout a:hover { text-decoration: underline; }
 
         /* ── Demo banner ── */
         .demo-banner {
@@ -833,42 +780,6 @@
                 <div id="detail-content"></div>
             </div>
 
-            <!-- How it works -->
-            <div class="how-section" id="how-section">
-                <h2>How Voting Works</h2>
-                <div class="steps">
-                    <div class="step">
-                        <div class="step-num">1</div>
-                        <h3>CI Syncs Discussions</h3>
-                        <p><code>sync-vote-discussions.js</code> creates one GitHub Discussion per plugin. Runs every 15 min via CI.</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-num">2</div>
-                        <h3>Cards Show Real Counts</h3>
-                        <p>CI exports reaction counts to <code>vote-counts.json</code>. Cards display read-only 👍👎 tallies from shared data.</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-num">3</div>
-                        <h3>Vote on Discussion</h3>
-                        <p>"💬 Vote on Discussion" opens the GitHub Discussion page. Users react with 👍 👎 ❤️ — counts refresh on next deploy.</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-num">4</div>
-                        <h3>Giscus Inline Voting</h3>
-                        <p>On detail pages, <a href="https://giscus.app" target="_blank" style="color:var(--color-accent-secondary)">Giscus</a> embeds the Discussion inline. Users react and comment without leaving the marketplace.</p>
-                    </div>
-                </div>
-
-                <div class="setup-callout">
-                    <h3>🔧 Setup for Repo Owner</h3>
-                    <ol>
-                        <li>Enable <strong>Discussions</strong> on the repo (Settings → Features)</li>
-                        <li>Allow <code>discussions: write</code> in GitHub Actions permissions</li>
-                        <li><em>(Optional)</em> Install <a href="https://github.com/apps/giscus">Giscus GitHub App</a> for inline Discussion embeds on detail pages</li>
-                        <li>Merge <a href="https://github.com/agency-microsoft/marketplace-web/pull/14">PR #14</a></li>
-                    </ol>
-                </div>
-            </div>
         </main>
 
         <footer class="footer">
@@ -1026,8 +937,6 @@ function renderCard(plugin) {
         <div class="plugin-description">${plugin.desc}</div>
         <div class="plugin-footer">
             <div class="plugin-stats">
-                <span class="stat-item" style="opacity:0.5" title="Placeholder — install tracking coming soon">📥 -1</span>
-                <span class="stat-separator">·</span>
                 ${plugin.skills ? `<span class="stat-item">⚡ ${plugin.skills} Skills</span>` : ''}
                 ${plugin.skills && plugin.agents ? `<span class="stat-separator">·</span>` : ''}
                 ${plugin.agents ? `<span class="stat-item">🤖 ${plugin.agents} Agent${plugin.agents !== 1 ? 's' : ''}</span>` : ''}
@@ -1035,6 +944,7 @@ function renderCard(plugin) {
             <span class="category-badge">${plugin.category}</span>
         </div>
         <div class="engagement-row">
+            <span class="engagement-icon" style="opacity:0.5" title="Placeholder — install tracking coming soon">📥 -1</span>
             ${reactionHtml}
             <button class="fav-btn ${isFav ? 'active' : ''}" data-fav="${plugin.name}" title="Favorite (personal bookmark)" aria-label="Favorite ${plugin.name}" aria-pressed="${isFav}">
                 ${isFav ? '❤️' : '🤍'}
@@ -1060,7 +970,6 @@ function showDetail(pluginName, initialTab = 'overview') {
     document.querySelector('.search-section').style.display = 'none';
     document.querySelector('.hero').style.display = 'none';
     document.querySelector('.demo-banner').style.display = 'none';
-    document.getElementById('how-section').style.display = 'none';
 
     const dp = document.getElementById('detail-page');
     dp.classList.add('visible');
@@ -1076,7 +985,7 @@ function showDetail(pluginName, initialTab = 'overview') {
         </div>
         <div class="detail-tabs" role="tablist" aria-label="Plugin detail tabs">
             <button class="detail-tab" role="tab" id="tab-overview" aria-selected="true" aria-controls="panel-overview">Overview</button>
-            <button class="detail-tab" role="tab" id="tab-discussion" aria-selected="false" aria-controls="panel-discussion">💬 Discussion</button>
+            <button class="detail-tab" role="tab" id="tab-discussion" aria-selected="false" aria-controls="panel-discussion">💬 Discussions</button>
         </div>
 
         <div class="detail-tabpanel active" role="tabpanel" id="panel-overview" aria-labelledby="tab-overview">
@@ -1174,7 +1083,6 @@ function hideDetail() {
     document.querySelector('.search-section').style.display = '';
     document.querySelector('.hero').style.display = '';
     document.querySelector('.demo-banner').style.display = '';
-    document.getElementById('how-section').style.display = '';
     // Clean up Giscus iframe + scripts so a fresh instance loads next time
     document.querySelectorAll('script[src*="giscus.app"]').forEach(s => s.remove());
     document.querySelectorAll('.giscus-frame').forEach(f => f.remove());
@@ -1229,10 +1137,14 @@ document.getElementById('sort-filter').addEventListener('change', (e) => {
     const favs = getFavs();
 
     if (e.target.value === 'myFavorites') {
-        // Show only favorited plugins
-        cards.forEach(c => {
-            c.style.display = favs[c.dataset.plugin] ? '' : 'none';
+        // Show all plugins, favorites first
+        cards.forEach(c => { c.style.display = ''; });
+        cards.sort((a, b) => {
+            const favA = favs[a.dataset.plugin] ? 1 : 0;
+            const favB = favs[b.dataset.plugin] ? 1 : 0;
+            return favB - favA || a.dataset.plugin.localeCompare(b.dataset.plugin);
         });
+        cards.forEach(c => grid.appendChild(c));
         return;
     }
 

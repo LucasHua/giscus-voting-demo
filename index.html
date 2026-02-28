@@ -412,6 +412,29 @@
             padding: 2px 8px;
             border-radius: 9999px;
         }
+        .plugin-category {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        .card-copy-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border: none;
+            background: transparent;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            transition: color 0.15s, background 0.15s;
+        }
+        .card-copy-btn:hover {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+        }
+        .card-copy-btn.copied { color: var(--color-green); }
+        .card-copy-btn svg { width: 14px; height: 14px; }
 
         /* ── Engagement Row (Reactions) ── */
         .engagement-row {
@@ -480,21 +503,31 @@
             display: inline-flex;
             align-items: center;
             gap: var(--spacing-sm);
-            background: var(--color-bg-secondary);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-sm);
-            color: var(--color-text-secondary);
-            font-size: 0.875rem;
-            padding: var(--spacing-sm) var(--spacing-md);
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+            padding: 0;
             cursor: pointer;
             margin-bottom: var(--spacing-lg);
-            transition: all 0.2s;
+            transition: color 0.2s;
         }
         .back-btn:hover {
             color: var(--color-accent);
-            border-color: var(--color-border-hover);
         }
         .back-btn svg { width: 16px; height: 16px; }
+        .breadcrumb {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            margin-bottom: var(--spacing-md);
+        }
+        .breadcrumb a {
+            color: var(--color-accent-secondary);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .breadcrumb .sep { margin: 0 var(--spacing-xs); }
         .detail-header {
             margin-bottom: var(--spacing-lg);
         }
@@ -1156,7 +1189,12 @@ function renderCard(plugin) {
                 ${plugin.skills && plugin.agents ? `<span class="stat-separator">·</span>` : ''}
                 ${plugin.agents ? `<span class="stat-item">🤖 ${plugin.agents} Agent${plugin.agents !== 1 ? 's' : ''}</span>` : ''}
             </div>
-            <span class="category-badge">${plugin.category}</span>
+            <div class="plugin-category">
+                <span class="category-badge">${plugin.category}</span>
+                <button class="card-copy-btn" data-install-cmd="/plugin install ${plugin.name}@agency-microsoft" title="Copy install command" aria-label="Copy install command for ${plugin.name}" onclick="event.stopPropagation(); navigator.clipboard.writeText(this.dataset.installCmd); this.classList.add('copied'); setTimeout(()=>this.classList.remove('copied'),1500);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+            </div>
         </div>
         <div class="engagement-row">
             <span class="engagement-icon" style="opacity:0.5" title="Placeholder — install tracking coming soon">📥 -1</span>
@@ -1203,6 +1241,9 @@ function showDetail(pluginName, initialTab = 'overview') {
     dp.classList.add('visible');
 
     document.getElementById('detail-content').innerHTML = `
+        <nav class="breadcrumb">
+            <a id="breadcrumb-back">Plugins</a><span class="sep">›</span><span>${plugin.name}</span>
+        </nav>
         <div class="detail-header">
             <div class="detail-title">${plugin.name}</div>
             <div class="detail-meta">
@@ -1211,15 +1252,12 @@ function showDetail(pluginName, initialTab = 'overview') {
                 <span class="quality-score-badge ${plugin.quality === 'high' ? 'quality-high' : 'quality-mid'}">${plugin.qualityLabel}</span>
             </div>
         </div>
-        ${plugin.sources ? `<div class="detail-source-tabs" role="tablist">
-            ${plugin.sources.map(src => `<button class="detail-source-tab ${src.key === plugin.source ? 'active' : ''}" data-source-key="${src.key}" role="tab" aria-selected="${src.key === plugin.source}">${src.badge} ${src.label}<span class="source-tab-version">v${src.version}</span></button>`).join('')}
-        </div>` : ''}
-        <div class="detail-tabs" role="tablist" aria-label="Plugin detail tabs">
-            <button class="detail-tab" role="tab" id="tab-overview" aria-selected="true" aria-controls="panel-overview">Overview</button>
-            <button class="detail-tab" role="tab" id="tab-discussion" aria-selected="false" aria-controls="panel-discussion">💬 Discussions</button>
+        <div class="detail-source-tabs" role="tablist">
+            ${plugin.sources ? plugin.sources.map(src => `<button class="detail-source-tab ${src.key === plugin.source ? 'active' : ''}" data-source-key="${src.key}" role="tab" aria-selected="${src.key === plugin.source}">${src.badge} ${src.label}<span class="source-tab-version">v${src.version}</span></button>`).join('') : ''}
+            <button class="detail-source-tab" data-source-key="discussion" role="tab" aria-selected="false">💬 Discussions</button>
         </div>
 
-        <div class="detail-tabpanel active" role="tabpanel" id="panel-overview" aria-labelledby="tab-overview">
+        <div id="panel-overview">
             <div class="detail-description">${plugin.desc}</div>
             ${plugin.skills || plugin.agents ? `
         <div class="detail-section">
@@ -1301,7 +1339,7 @@ function showDetail(pluginName, initialTab = 'overview') {
 
         </div>
 
-        <div class="detail-tabpanel" role="tabpanel" id="panel-discussion" aria-labelledby="tab-discussion">
+        <div id="panel-discussion" style="display:none;">
             <div class="plugin-info-card">
                 <p class="plugin-info-desc">${plugin.desc}</p>
                 ${plugin.discussion ? '<a class="plugin-info-link" href="' + plugin.discussion + '" target="_blank" rel="noopener">View full discussion on GitHub ↗</a>' : ''}
@@ -1313,10 +1351,30 @@ function showDetail(pluginName, initialTab = 'overview') {
         </div>
     `;
 
-    // Tab switching
-    dp.querySelectorAll('.detail-tab').forEach(tab => {
-        tab.addEventListener('click', () => switchDetailTab(tab.id.replace('tab-', ''), plugin));
+    // Source tab switching (including Discussion)
+    dp.querySelectorAll('.detail-source-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const key = tab.dataset.sourceKey;
+            dp.querySelectorAll('.detail-source-tab').forEach(t => {
+                t.classList.toggle('active', t === tab);
+                t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+            });
+            const overview = dp.querySelector('#panel-overview');
+            const discussion = dp.querySelector('#panel-discussion');
+            if (key === 'discussion') {
+                overview.style.display = 'none';
+                discussion.style.display = 'block';
+                loadGiscus(plugin);
+            } else {
+                overview.style.display = 'block';
+                discussion.style.display = 'none';
+            }
+        });
     });
+
+    // Breadcrumb back
+    const breadcrumbBack = dp.querySelector('#breadcrumb-back');
+    if (breadcrumbBack) breadcrumbBack.addEventListener('click', hideDetail);
 
     // Install sub-tab switching
     dp.querySelectorAll('.install-tab').forEach(tab => {
@@ -1326,7 +1384,6 @@ function showDetail(pluginName, initialTab = 'overview') {
             tab.classList.add('active');
             const panel = dp.querySelector(`[data-install-panel="${tab.dataset.installTab}"]`);
             if (panel) panel.classList.add('active');
-            // Render file tree when Download tab opened
             if (tab.dataset.installTab === 'download') renderZipTree(plugin);
         });
     });
@@ -1339,27 +1396,11 @@ function showDetail(pluginName, initialTab = 'overview') {
 
     // Switch to requested tab
     if (initialTab === 'discussion') {
-        switchDetailTab('discussion', plugin);
+        const discTab = dp.querySelector('[data-source-key="discussion"]');
+        if (discTab) discTab.click();
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function switchDetailTab(tabName, plugin) {
-    const dp = document.getElementById('detail-page');
-    // Update tab buttons
-    dp.querySelectorAll('.detail-tab').forEach(t => {
-        const isActive = t.id === 'tab-' + tabName;
-        t.setAttribute('aria-selected', isActive ? 'true' : 'false');
-    });
-    // Update panels
-    dp.querySelectorAll('.detail-tabpanel').forEach(p => {
-        p.classList.toggle('active', p.id === 'panel-' + tabName);
-    });
-    // Lazy-load Giscus when Discussion tab first activated
-    if (tabName === 'discussion') {
-        loadGiscus(plugin);
-    }
 }
 
 function loadGiscus(plugin) {

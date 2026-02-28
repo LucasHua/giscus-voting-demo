@@ -592,6 +592,153 @@
         .detail-tabpanel { display: none; }
         .detail-tabpanel.active { display: block; }
 
+        /* Install tabs (sub-tabs within Overview) */
+        .install-tabs-container {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+        .install-tabs {
+            display: flex;
+            gap: var(--spacing-xs);
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: var(--spacing-md);
+        }
+        .install-tab {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .install-tab:hover { color: var(--color-text-secondary); }
+        .install-tab.active {
+            color: var(--color-text-primary);
+            border-bottom-color: var(--color-accent);
+        }
+        .install-panel { display: none; }
+        .install-panel.active { display: block; }
+        .install-description {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            margin-bottom: var(--spacing-md);
+            line-height: 1.6;
+        }
+        .install-description a {
+            color: var(--color-accent-secondary);
+            text-decoration: none;
+        }
+        .detail-steps {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        .detail-step {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+        .detail-step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-accent);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .detail-step-label {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+        }
+        .detail-step code {
+            background: rgba(110,118,129,0.2);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            color: var(--color-text-primary);
+        }
+        .detail-step-or {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+        .step-copy-btn {
+            background: none;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            color: var(--color-text-muted);
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            transition: all 0.15s;
+        }
+        .step-copy-btn:hover {
+            border-color: var(--color-accent);
+            color: var(--color-text-primary);
+        }
+        /* Download ZIP */
+        .download-zip-area {
+            text-align: center;
+            padding: var(--spacing-lg) 0;
+        }
+        .download-zip-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            background: var(--color-accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 10px 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .download-zip-btn:hover { background: #1a8cd8; }
+        .download-zip-btn:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+        .download-zip-status {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-top: var(--spacing-sm);
+            min-height: 1.2em;
+        }
+        .download-zip-contents {
+            margin-top: var(--spacing-md);
+            text-align: left;
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+        }
+        .download-zip-contents summary {
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+        .download-zip-tree {
+            font-family: 'SFMono-Regular', Consolas, monospace;
+            font-size: 0.75rem;
+            white-space: pre;
+            line-height: 1.6;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--color-border);
+        }
+
         /* Giscus section */
         .detail-section {
             background: var(--color-bg-secondary);
@@ -722,6 +869,7 @@
             .ascii-banner { display: none; }
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -1094,6 +1242,63 @@ function showDetail(pluginName, initialTab = 'overview') {
             </div>
         </div>
         ` : ''}
+
+        <!-- Install / Download Section -->
+        <div class="install-tabs-container">
+            <div class="install-tabs" role="tablist">
+                <button class="install-tab active" data-install-tab="install" role="tab">Install</button>
+                <button class="install-tab" data-install-tab="uninstall" role="tab">Uninstall</button>
+                <button class="install-tab" data-install-tab="download" role="tab">📦 Download ZIP</button>
+            </div>
+            <div class="install-panel active" data-install-panel="install" role="tabpanel">
+                <p class="install-description">Need the Agency CLI? <a href="https://aka.ms/agency" target="_blank" rel="noopener">Get it here</a></p>
+                <div class="detail-steps">
+                    <div class="detail-step">
+                        <span class="detail-step-number">1</span>
+                        <span class="detail-step-label">Launch Copilot or Claude</span>
+                    </div>
+                    <div class="detail-step">
+                        <span class="detail-step-number">2</span>
+                        <span class="detail-step-label">Add marketplace</span>
+                        <code>/plugin marketplace add agency-microsoft</code>
+                        <button class="step-copy-btn" onclick="navigator.clipboard.writeText('/plugin marketplace add agency-microsoft')">📋</button>
+                    </div>
+                    <div class="detail-step">
+                        <span class="detail-step-number">3</span>
+                        <span class="detail-step-label">Install plugin</span>
+                        <code>/plugin install ${plugin.name}@agency-microsoft</code>
+                        <button class="step-copy-btn" onclick="navigator.clipboard.writeText('/plugin install ${plugin.name}@agency-microsoft')">📋</button>
+                    </div>
+                </div>
+            </div>
+            <div class="install-panel" data-install-panel="uninstall" role="tabpanel">
+                <p class="install-description">Remove the plugin from your environment:</p>
+                <div class="detail-steps">
+                    <div class="detail-step">
+                        <span class="detail-step-number">1</span>
+                        <span class="detail-step-label">Launch Copilot or Claude</span>
+                    </div>
+                    <div class="detail-step">
+                        <span class="detail-step-number">2</span>
+                        <span class="detail-step-label">Uninstall</span>
+                        <code>/plugin uninstall ${plugin.name}</code>
+                        <button class="step-copy-btn" onclick="navigator.clipboard.writeText('/plugin uninstall ${plugin.name}')">📋</button>
+                    </div>
+                </div>
+            </div>
+            <div class="install-panel" data-install-panel="download" role="tabpanel">
+                <p class="install-description">Download this plugin as a ZIP package for manual upload to Bizchat.</p>
+                <div class="download-zip-area">
+                    <button class="download-zip-btn" id="download-zip-btn" data-plugin="${plugin.name}">📦 Download ${plugin.name}.zip</button>
+                    <div class="download-zip-status" id="download-zip-status"></div>
+                </div>
+                <details class="download-zip-contents">
+                    <summary>Package contents</summary>
+                    <div class="download-zip-tree" id="download-zip-tree"></div>
+                </details>
+            </div>
+        </div>
+
         </div>
 
         <div class="detail-tabpanel" role="tabpanel" id="panel-discussion" aria-labelledby="tab-discussion">
@@ -1112,6 +1317,25 @@ function showDetail(pluginName, initialTab = 'overview') {
     dp.querySelectorAll('.detail-tab').forEach(tab => {
         tab.addEventListener('click', () => switchDetailTab(tab.id.replace('tab-', ''), plugin));
     });
+
+    // Install sub-tab switching
+    dp.querySelectorAll('.install-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            dp.querySelectorAll('.install-tab').forEach(t => t.classList.remove('active'));
+            dp.querySelectorAll('.install-panel').forEach(p => p.classList.remove('active'));
+            tab.classList.add('active');
+            const panel = dp.querySelector(`[data-install-panel="${tab.dataset.installTab}"]`);
+            if (panel) panel.classList.add('active');
+            // Render file tree when Download tab opened
+            if (tab.dataset.installTab === 'download') renderZipTree(plugin);
+        });
+    });
+
+    // Download ZIP button
+    const zipBtn = dp.querySelector('#download-zip-btn');
+    if (zipBtn) {
+        zipBtn.addEventListener('click', () => downloadPluginZip(plugin));
+    }
 
     // Switch to requested tab
     if (initialTab === 'discussion') {
@@ -1170,6 +1394,93 @@ function hideDetail() {
     // Clean up Giscus iframe + scripts so a fresh instance loads next time
     document.querySelectorAll('script[src*="giscus.app"]').forEach(s => s.remove());
     document.querySelectorAll('.giscus-frame').forEach(f => f.remove());
+}
+
+// ── Download as ZIP ──
+function getPluginFiles(plugin) {
+    const files = [];
+    const name = plugin.name;
+    // plugin.json manifest
+    files.push({
+        path: `${name}/plugin.json`,
+        content: JSON.stringify({
+            name: plugin.name,
+            version: plugin.version,
+            description: plugin.desc,
+            author: plugin.author,
+            category: plugin.category,
+        }, null, 2)
+    });
+    // README.md
+    files.push({
+        path: `${name}/README.md`,
+        content: `# ${plugin.name}\n\n${plugin.desc}\n\n**Author:** ${plugin.author}  \n**Version:** ${plugin.version}  \n**Category:** ${plugin.category}\n`
+    });
+    // Skills
+    for (let i = 0; i < (plugin.skills || 0); i++) {
+        const skillName = `${name}-skill-${i + 1}`;
+        files.push({
+            path: `${name}/skills/${skillName}/SKILL.md`,
+            content: `---\nname: ${skillName}\ndescription: Skill ${i + 1} for ${name}\n---\n\nThis is a skill for the ${name} plugin.\n`
+        });
+    }
+    // Agents
+    for (let i = 0; i < (plugin.agents || 0); i++) {
+        const agentName = `${name}-agent`;
+        files.push({
+            path: `${name}/agents/${agentName}.md`,
+            content: `---\nname: ${agentName}\ndescription: AI agent for ${plugin.category.toLowerCase()}\n---\n\nAgent for the ${name} plugin.\n`
+        });
+    }
+    return files;
+}
+
+function renderZipTree(plugin) {
+    const tree = document.getElementById('download-zip-tree');
+    if (!tree) return;
+    const files = getPluginFiles(plugin);
+    const lines = files.map(f => f.path).sort();
+    // Build tree display
+    const treeLines = [`${plugin.name}/`];
+    for (const line of lines) {
+        const rel = line.replace(`${plugin.name}/`, '');
+        const parts = rel.split('/');
+        const indent = '    '.repeat(parts.length - 1);
+        const prefix = parts.length > 1 ? '├── ' : '├── ';
+        treeLines.push(`${indent}${prefix}${parts[parts.length - 1]}`);
+    }
+    tree.textContent = treeLines.join('\n');
+}
+
+async function downloadPluginZip(plugin) {
+    const btn = document.getElementById('download-zip-btn');
+    const status = document.getElementById('download-zip-status');
+    if (!btn) return;
+
+    btn.disabled = true;
+    status.textContent = 'Generating ZIP…';
+
+    try {
+        const zip = new JSZip();
+        const files = getPluginFiles(plugin);
+        for (const f of files) {
+            zip.file(f.path, f.content);
+        }
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${plugin.name}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        status.textContent = `✅ Downloaded ${plugin.name}.zip (${(blob.size / 1024).toFixed(1)} KB)`;
+    } catch (err) {
+        status.textContent = `❌ Error: ${err.message}`;
+    } finally {
+        btn.disabled = false;
+    }
 }
 
 // ── Event Handlers ──

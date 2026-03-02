@@ -720,31 +720,7 @@
             border-color: var(--color-accent);
             color: var(--color-text-primary);
         }
-        /* Download ZIP */
-        .download-skill-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-top: var(--spacing-sm);
-        }
-        .download-skill-row {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            padding: 6px var(--spacing-sm);
-            background: var(--color-bg-primary);
-            border-radius: var(--radius-sm);
-        }
-        .download-skill-icon { flex-shrink: 0; font-size: 0.875rem; }
-        .download-skill-name {
-            flex: 1;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--color-text-primary);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+        /* Download ZIP — inline in skill items */
         .download-zip-btn {
             display: inline-flex;
             align-items: center;
@@ -753,12 +729,13 @@
             color: #fff;
             border: none;
             border-radius: var(--radius-sm);
-            padding: 6px 14px;
-            font-size: 0.8rem;
+            padding: 4px 12px;
+            font-size: 0.75rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             flex-shrink: 0;
+            margin-left: auto;
         }
         .download-zip-btn:hover { background: #1a8cd8; }
         .download-zip-btn:disabled {
@@ -853,7 +830,7 @@
         }
         .component-icon { font-size: 1rem; }
         .component-name { color: var(--color-text-primary); font-weight: 500; }
-        .component-desc { color: var(--color-text-muted); font-size: 0.8rem; margin-left: auto; }
+        .component-desc { color: var(--color-text-muted); font-size: 0.8rem; flex: 1; }
 
         /* ── Footer ── */
         .footer {
@@ -1267,13 +1244,16 @@ function showDetail(pluginName, initialTab = 'overview') {
         <div class="detail-section">
             <h3 class="detail-section-title">Components</h3>
             <div class="component-list">
-                ${Array.from({length: plugin.skills}, (_, i) => `
+                ${Array.from({length: plugin.skills}, (_, i) => {
+                    const skillName = `${plugin.name}-skill-${i + 1}`;
+                    return `
                     <div class="component-item">
                         <span class="component-icon">⚡</span>
-                        <span class="component-name">${plugin.name}-skill-${i + 1}</span>
+                        <span class="component-name">${skillName}</span>
                         <span class="component-desc">Sample skill description</span>
+                        <button class="download-zip-btn" data-download-skill="${skillName}" data-plugin="${plugin.name}" aria-label="Download as ZIP ${skillName}">Download as ZIP</button>
                     </div>
-                `).join('')}
+                `}).join('')}
                 ${Array.from({length: plugin.agents}, (_, i) => `
                     <div class="component-item">
                         <span class="component-icon">🤖</span>
@@ -1282,6 +1262,7 @@ function showDetail(pluginName, initialTab = 'overview') {
                     </div>
                 `).join('')}
             </div>
+            <div class="download-zip-status" aria-live="polite"></div>
         </div>
         ` : ''}
 
@@ -1290,7 +1271,6 @@ function showDetail(pluginName, initialTab = 'overview') {
             <div class="install-tabs" role="tablist">
                 <button class="install-tab active" data-install-tab="install" role="tab">Install</button>
                 <button class="install-tab" data-install-tab="uninstall" role="tab">Uninstall</button>
-                ${(plugin.skills || 0) > 0 ? '<button class="install-tab" data-install-tab="download" role="tab">Download as ZIP</button>' : ''}
             </div>
             <div class="install-panel active" data-install-panel="install" role="tabpanel">
                 <p class="install-description">Need the Agency CLI? <a href="https://aka.ms/agency" target="_blank" rel="noopener">Get it here</a></p>
@@ -1327,20 +1307,6 @@ function showDetail(pluginName, initialTab = 'overview') {
                         <button class="step-copy-btn" onclick="navigator.clipboard.writeText('/plugin uninstall ${plugin.name}')">📋</button>
                     </div>
                 </div>
-            </div>
-            <div class="install-panel" data-install-panel="download" role="tabpanel">
-                <p class="install-description">Download individual skills as ZIP packages for upload to Bizchat. Each ZIP includes the skill and any plugin scripts.</p>
-                <div class="download-skill-list">
-                    ${Array.from({length: plugin.skills || 0}, (_, i) => {
-                        const skillName = `${plugin.name}-skill-${i + 1}`;
-                        return `<div class="download-skill-row">
-                            <span class="download-skill-icon">⚡</span>
-                            <span class="download-skill-name">${skillName}</span>
-                            <button class="download-zip-btn" data-download-skill="${skillName}" data-plugin="${plugin.name}" aria-label="Download as ZIP ${skillName}">Download as ZIP</button>
-                        </div>`;
-                    }).join('')}
-                </div>
-                <div class="download-zip-status" aria-live="polite"></div>
             </div>
         </div>
 

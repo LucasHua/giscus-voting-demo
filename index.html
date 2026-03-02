@@ -1465,14 +1465,6 @@ function getPluginFiles(plugin) {
             content: `---\nname: ${skillName}\ndescription: Skill ${i + 1} for ${name}\n---\n\nThis is a skill for the ${name} plugin.\n`
         });
     }
-    // Agents
-    for (let i = 0; i < (plugin.agents || 0); i++) {
-        const agentName = `${name}-agent`;
-        files.push({
-            path: `${name}/agents/${agentName}.md`,
-            content: `---\nname: ${agentName}\ndescription: AI agent for ${plugin.category.toLowerCase()}\n---\n\nAgent for the ${name} plugin.\n`
-        });
-    }
     return files;
 }
 

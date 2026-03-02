@@ -720,30 +720,7 @@
             border-color: var(--color-accent);
             color: var(--color-text-primary);
         }
-        /* Download ZIP — icon button in skill items */
-        .download-zip-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 24px;
-            height: 24px;
-            padding: 4px;
-            background: var(--color-bg-tertiary);
-            color: var(--color-text-muted);
-            border: none;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-            flex-shrink: 0;
-            margin-left: auto;
-        }
-        .download-zip-btn:hover { background: var(--color-accent); color: #fff; }
-        .download-zip-btn:disabled { opacity: 0.5; cursor: wait; }
-        .download-zip-btn:focus-visible {
-            outline: 2px solid var(--color-accent);
-            outline-offset: 2px;
-        }
-        .download-zip-btn svg { width: 14px; height: 14px; }
+        /* Download ZIP — uses component-link styling */
         .download-zip-status {
             font-size: 0.8rem;
             color: var(--color-text-muted);
@@ -856,24 +833,110 @@
         }
         .plugin-info-link:hover { text-decoration: underline; }
 
-        /* Skills/agents detail */
+        /* Skills/agents detail — collapsible cards */
         .component-list {
             display: flex;
             flex-direction: column;
             gap: var(--spacing-sm);
         }
-        .component-item {
+        details.collapsible {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            padding: var(--spacing-lg);
+            background: linear-gradient(135deg, var(--color-bg-secondary), var(--color-bg-primary));
+            border-radius: var(--radius-md);
+            border: 1px solid var(--color-border);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        details.collapsible:hover {
+            border-color: var(--color-accent);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        details.collapsible::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            border-radius: 2px;
+        }
+        details.skill-detail::before {
+            background: linear-gradient(180deg, var(--color-accent), #39c5cf);
+        }
+        details.agent-detail::before {
+            background: linear-gradient(180deg, #a371f7, rgba(163,113,247,0.6));
+        }
+        details.collapsible:not([open]) {
+            padding-bottom: var(--spacing-md);
+        }
+        details.collapsible > summary {
             display: flex;
             align-items: center;
             gap: var(--spacing-sm);
-            padding: var(--spacing-sm) var(--spacing-md);
-            background: var(--color-bg-tertiary);
-            border-radius: var(--radius-sm);
-            font-size: 0.875rem;
+            list-style: none;
+            cursor: pointer;
+            padding-left: var(--spacing-sm);
         }
+        details.collapsible > summary::-webkit-details-marker { display: none !important; }
+        details.collapsible > summary::marker { display: none !important; content: none; }
         .component-icon { font-size: 1rem; }
-        .component-name { color: var(--color-text-primary); font-weight: 500; }
-        .component-desc { color: var(--color-text-muted); font-size: 0.8rem; flex: 1; }
+        .component-name { color: var(--color-text-primary); font-weight: 500; user-select: text; cursor: text; }
+        .component-type {
+            font-size: 0.6875rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.05em; color: var(--color-accent);
+            background: rgba(88,166,255,0.1); padding: 2px 8px;
+            border-radius: 999px;
+        }
+        details.collapsible > summary .spacer { flex: 1; }
+        .collapse-icon {
+            width: 24px; height: 24px; padding: 4px;
+            color: var(--color-text-muted); background: var(--color-bg-tertiary);
+            border-radius: var(--radius-sm); flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.2s, background 0.2s, color 0.2s;
+        }
+        .collapse-icon svg { width: 16px; height: 16px; }
+        details.collapsible:hover .collapse-icon { background: rgba(88,166,255,0.1); color: var(--color-accent); }
+        details.collapsible[open] .collapse-icon { transform: rotate(180deg); }
+        details.collapsible .component-link {
+            width: 24px; height: 24px; padding: 4px;
+            color: var(--color-text-muted); background: var(--color-bg-tertiary);
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s, color 0.2s;
+            text-decoration: none; border: none; cursor: pointer;
+        }
+        details.collapsible .component-link svg { width: 14px; height: 14px; }
+        details.collapsible .component-link:hover { background: rgba(88,166,255,0.1); color: var(--color-accent); }
+        details.collapsible .component-link:disabled { opacity: 0.5; cursor: not-allowed; }
+        details.collapsible > .component-preview {
+            font-size: 0.8125rem; color: var(--color-text-muted);
+            padding: var(--spacing-xs) var(--spacing-sm) 0 calc(var(--spacing-sm) + 28px);
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        details.collapsible[open] > .component-preview { display: none; }
+        details.collapsible .component-body {
+            padding-top: var(--spacing-md);
+            display: flex; flex-direction: column; gap: var(--spacing-md);
+            animation: slideDown 0.2s ease;
+        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+        .skill-section { display: flex; flex-direction: column; gap: var(--spacing-sm); padding-left: var(--spacing-sm); }
+        .skill-section-label {
+            font-size: 0.6875rem; font-weight: 600; color: var(--color-accent);
+            text-transform: uppercase; letter-spacing: 0.1em;
+        }
+        .skill-description { font-size: 0.9375rem; color: var(--color-text-secondary); line-height: 1.7; margin: 0; }
+        .skill-path {
+            display: flex; align-items: center; gap: var(--spacing-sm);
+            margin-top: var(--spacing-md); padding-top: var(--spacing-md);
+            border-top: 1px solid rgba(110,118,129,0.2);
+            padding-left: var(--spacing-sm); font-size: 0.8125rem;
+        }
+        .skill-path-label { color: var(--color-text-muted); }
 
         /* ── Footer ── */
         .footer {
@@ -1300,20 +1363,51 @@ function showDetail(pluginName, initialTab = 'overview') {
             <div class="component-list">
                 ${Array.from({length: plugin.skills}, (_, i) => {
                     const skillName = `${plugin.name}-skill-${i + 1}`;
+                    const desc = `Sample skill ${i + 1} for ${plugin.name}`;
                     return `
-                    <div class="component-item">
-                        <span class="component-icon">⚡</span>
-                        <span class="component-name">${skillName}</span>
-                        <span class="component-desc">Sample skill description</span>
-                        <button class="download-zip-btn" data-download-skill="${skillName}" data-plugin="${plugin.name}" title="Download as ZIP" aria-label="Download as ZIP ${skillName}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-                    </div>
+                    <details class="component-detail skill-detail collapsible">
+                        <summary>
+                            <span class="component-icon">⚡</span>
+                            <span class="component-name">${skillName}</span>
+                            <span class="component-type">skill</span>
+                            <span class="spacer"></span>
+                            <span class="collapse-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span>
+                        </summary>
+                        <button class="component-link" data-download-skill="${skillName}" data-plugin="${plugin.name}" title="Download as ZIP" aria-label="Download as ZIP ${skillName}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+                        <div class="component-preview">${desc}</div>
+                        <div class="component-body">
+                            <div class="skill-section">
+                                <div class="skill-section-label">When to use</div>
+                                <p class="skill-description">${desc}</p>
+                            </div>
+                            <div class="skill-section">
+                                <div class="skill-section-label">Instructions</div>
+                                <p class="skill-description">This skill provides automated assistance for ${plugin.category.toLowerCase()} workflows.</p>
+                            </div>
+                            <div class="skill-path">
+                                <span class="skill-path-label">Source:</span>
+                                <code>plugins/${plugin.name}/skills/${skillName}/SKILL.md</code>
+                            </div>
+                        </div>
+                    </details>
                 `}).join('')}
                 ${Array.from({length: plugin.agents}, (_, i) => `
-                    <div class="component-item">
-                        <span class="component-icon">🤖</span>
-                        <span class="component-name">${plugin.name}-agent</span>
-                        <span class="component-desc">AI agent for ${plugin.category.toLowerCase()}</span>
-                    </div>
+                    <details class="component-detail agent-detail collapsible">
+                        <summary>
+                            <span class="component-icon">🤖</span>
+                            <span class="component-name">${plugin.name}-agent</span>
+                            <span class="component-type">agent</span>
+                            <span class="spacer"></span>
+                            <span class="collapse-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span>
+                        </summary>
+                        <div class="component-preview">AI agent for ${plugin.category.toLowerCase()}</div>
+                        <div class="component-body">
+                            <div class="skill-section">
+                                <div class="skill-section-label">Description</div>
+                                <p class="skill-description">Autonomous agent that handles ${plugin.category.toLowerCase()} tasks.</p>
+                            </div>
+                        </div>
+                    </details>
                 `).join('')}
             </div>
             <div class="download-zip-status" aria-live="polite"></div>
@@ -1412,11 +1506,6 @@ function showDetail(pluginName, initialTab = 'overview') {
             const panel = dp.querySelector(`[data-install-panel="${tab.dataset.installTab}"]`);
             if (panel) panel.classList.add('active');
         });
-    });
-
-    // Download ZIP per-skill buttons
-    dp.querySelectorAll('.download-zip-btn[data-download-skill]').forEach(btn => {
-        btn.addEventListener('click', () => downloadSkillZip(plugin, btn.dataset.downloadSkill, btn));
     });
 
     // Switch to requested tab
@@ -1565,6 +1654,26 @@ document.addEventListener('click', (e) => {
             btn.setAttribute('aria-pressed', String(isFav));
             btn.textContent = isFav ? '❤️' : '🤍';
         });
+        return;
+    }
+
+    // Download ZIP button in skill card
+    const dlBtn = e.target.closest('.component-link[data-download-skill]');
+    if (dlBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const plugin = PLUGINS.find(p => p.name === dlBtn.dataset.plugin);
+        if (plugin) downloadSkillZip(plugin, dlBtn.dataset.downloadSkill, dlBtn);
+        return;
+    }
+
+    // Collapsible component cards — toggle on click (except on buttons/links/body)
+    const collapsible = e.target.closest('details.collapsible');
+    if (collapsible) {
+        if (e.target.closest('a, button')) return;
+        if (e.target.closest('.component-body')) return;
+        e.preventDefault();
+        collapsible.open = !collapsible.open;
         return;
     }
 

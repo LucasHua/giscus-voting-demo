@@ -721,9 +721,29 @@
             color: var(--color-text-primary);
         }
         /* Download ZIP */
-        .download-zip-area {
-            text-align: center;
-            padding: var(--spacing-lg) 0;
+        .download-skill-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: var(--spacing-sm);
+        }
+        .download-skill-row {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: 6px var(--spacing-sm);
+            background: var(--color-bg-primary);
+            border-radius: var(--radius-sm);
+        }
+        .download-skill-icon { flex-shrink: 0; font-size: 0.875rem; }
+        .download-skill-name {
+            flex: 1;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .download-zip-btn {
             display: inline-flex;
@@ -733,43 +753,27 @@
             color: #fff;
             border: none;
             border-radius: var(--radius-sm);
-            padding: 10px 24px;
-            font-size: 0.9rem;
+            padding: 6px 14px;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            flex-shrink: 0;
         }
         .download-zip-btn:hover { background: #1a8cd8; }
         .download-zip-btn:disabled {
             opacity: 0.6;
             cursor: wait;
         }
+        .download-zip-btn:focus-visible {
+            outline: 2px solid var(--color-text-primary);
+            outline-offset: 2px;
+        }
         .download-zip-status {
             font-size: 0.8rem;
             color: var(--color-text-muted);
             margin-top: var(--spacing-sm);
             min-height: 1.2em;
-        }
-        .download-zip-contents {
-            margin-top: var(--spacing-md);
-            text-align: left;
-            font-size: 0.8rem;
-            color: var(--color-text-muted);
-        }
-        .download-zip-contents summary {
-            cursor: pointer;
-            color: var(--color-text-secondary);
-            margin-bottom: var(--spacing-sm);
-        }
-        .download-zip-tree {
-            font-family: 'SFMono-Regular', Consolas, monospace;
-            font-size: 0.75rem;
-            white-space: pre;
-            line-height: 1.6;
-            padding: var(--spacing-sm) var(--spacing-md);
-            background: var(--color-bg-primary);
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--color-border);
         }
 
         /* Giscus section */
@@ -1286,7 +1290,7 @@ function showDetail(pluginName, initialTab = 'overview') {
             <div class="install-tabs" role="tablist">
                 <button class="install-tab active" data-install-tab="install" role="tab">Install</button>
                 <button class="install-tab" data-install-tab="uninstall" role="tab">Uninstall</button>
-                <button class="install-tab" data-install-tab="download" role="tab">Download as ZIP</button>
+                ${(plugin.skills || 0) > 0 ? '<button class="install-tab" data-install-tab="download" role="tab">Download as ZIP</button>' : ''}
             </div>
             <div class="install-panel active" data-install-panel="install" role="tabpanel">
                 <p class="install-description">Need the Agency CLI? <a href="https://aka.ms/agency" target="_blank" rel="noopener">Get it here</a></p>
@@ -1325,15 +1329,18 @@ function showDetail(pluginName, initialTab = 'overview') {
                 </div>
             </div>
             <div class="install-panel" data-install-panel="download" role="tabpanel">
-                <p class="install-description">Download this plugin as a ZIP package for manual upload to Bizchat.</p>
-                <div class="download-zip-area">
-                    <button class="download-zip-btn" id="download-zip-btn" data-plugin="${plugin.name}">📦 Download as ZIP</button>
-                    <div class="download-zip-status" id="download-zip-status"></div>
+                <p class="install-description">Download individual skills as ZIP packages for upload to Bizchat. Each ZIP includes the skill and any plugin scripts.</p>
+                <div class="download-skill-list">
+                    ${Array.from({length: plugin.skills || 0}, (_, i) => {
+                        const skillName = `${plugin.name}-skill-${i + 1}`;
+                        return `<div class="download-skill-row">
+                            <span class="download-skill-icon">⚡</span>
+                            <span class="download-skill-name">${skillName}</span>
+                            <button class="download-zip-btn" data-download-skill="${skillName}" data-plugin="${plugin.name}" aria-label="Download as ZIP ${skillName}">Download as ZIP</button>
+                        </div>`;
+                    }).join('')}
                 </div>
-                <details class="download-zip-contents">
-                    <summary>Package contents</summary>
-                    <div class="download-zip-tree" id="download-zip-tree"></div>
-                </details>
+                <div class="download-zip-status" aria-live="polite"></div>
             </div>
         </div>
 
@@ -1384,15 +1391,13 @@ function showDetail(pluginName, initialTab = 'overview') {
             tab.classList.add('active');
             const panel = dp.querySelector(`[data-install-panel="${tab.dataset.installTab}"]`);
             if (panel) panel.classList.add('active');
-            if (tab.dataset.installTab === 'download') renderZipTree(plugin);
         });
     });
 
-    // Download ZIP button
-    const zipBtn = dp.querySelector('#download-zip-btn');
-    if (zipBtn) {
-        zipBtn.addEventListener('click', () => downloadPluginZip(plugin));
-    }
+    // Download ZIP per-skill buttons
+    dp.querySelectorAll('.download-zip-btn[data-download-skill]').forEach(btn => {
+        btn.addEventListener('click', () => downloadSkillZip(plugin, btn.dataset.downloadSkill, btn));
+    });
 
     // Switch to requested tab
     if (initialTab === 'discussion') {
@@ -1437,82 +1442,38 @@ function hideDetail() {
     document.querySelectorAll('.giscus-frame').forEach(f => f.remove());
 }
 
-// ── Download as ZIP ──
-function getPluginFiles(plugin) {
-    const files = [];
-    const name = plugin.name;
-    // plugin.json manifest
-    files.push({
-        path: `${name}/plugin.json`,
-        content: JSON.stringify({
-            name: plugin.name,
-            version: plugin.version,
-            description: plugin.desc,
-            author: plugin.author,
-            category: plugin.category,
-        }, null, 2)
-    });
-    // README.md
-    files.push({
-        path: `${name}/README.md`,
-        content: `# ${plugin.name}\n\n${plugin.desc}\n\n**Author:** ${plugin.author}  \n**Version:** ${plugin.version}  \n**Category:** ${plugin.category}\n`
-    });
-    // Skills
-    for (let i = 0; i < (plugin.skills || 0); i++) {
-        const skillName = `${name}-skill-${i + 1}`;
-        files.push({
-            path: `${name}/skills/${skillName}/SKILL.md`,
-            content: `---\nname: ${skillName}\ndescription: Skill ${i + 1} for ${name}\n---\n\nThis is a skill for the ${name} plugin.\n`
-        });
-    }
-    return files;
-}
-
-function renderZipTree(plugin) {
-    const tree = document.getElementById('download-zip-tree');
-    if (!tree) return;
-    const files = getPluginFiles(plugin);
-    const lines = files.map(f => f.path).sort();
-    // Build tree display
-    const treeLines = [`${plugin.name}/`];
-    for (const line of lines) {
-        const rel = line.replace(`${plugin.name}/`, '');
-        const parts = rel.split('/');
-        const indent = '    '.repeat(parts.length - 1);
-        const prefix = parts.length > 1 ? '├── ' : '├── ';
-        treeLines.push(`${indent}${prefix}${parts[parts.length - 1]}`);
-    }
-    tree.textContent = treeLines.join('\n');
-}
-
-async function downloadPluginZip(plugin) {
-    const btn = document.getElementById('download-zip-btn');
-    const status = document.getElementById('download-zip-status');
-    if (!btn) return;
-
-    btn.disabled = true;
-    status.textContent = 'Generating ZIP…';
+// ── Download as ZIP (per-skill) ──
+async function downloadSkillZip(plugin, skillName, btn) {
+    const statusEl = document.querySelector('.download-zip-status');
+    if (btn) btn.disabled = true;
+    if (statusEl) statusEl.textContent = 'Generating ZIP…';
 
     try {
         const zip = new JSZip();
-        const files = getPluginFiles(plugin);
-        for (const f of files) {
-            zip.file(f.path, f.content);
-        }
+        const folder = zip.folder(skillName);
+
+        // SKILL.md
+        folder.file('SKILL.md',
+            `---\nname: ${skillName}\ndescription: Skill for ${plugin.name}\n---\n\nThis is the ${skillName} skill for the ${plugin.name} plugin.\n`
+        );
+
+        // Include mock scripts (demo has no real scripts, add a sample)
+        folder.file('scripts/setup.ps1', `# Setup script for ${plugin.name}\nWrite-Host "Setting up ${plugin.name}"\n`);
+
         const blob = await zip.generateAsync({ type: 'blob' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${plugin.name}.zip`;
+        a.download = `${skillName}.zip`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        status.textContent = `✅ Downloaded ${plugin.name}.zip (${(blob.size / 1024).toFixed(1)} KB)`;
+        if (statusEl) statusEl.textContent = `✅ Downloaded ${skillName}.zip (${(blob.size / 1024).toFixed(1)} KB)`;
     } catch (err) {
-        status.textContent = `❌ Error: ${err.message}`;
+        if (statusEl) statusEl.textContent = `❌ Error: ${err.message}`;
     } finally {
-        btn.disabled = false;
+        if (btn) btn.disabled = false;
     }
 }
 
